@@ -1,7 +1,7 @@
 # Проект «Киноман» [![Build status][travis-image]][travis-url]
 
 * Студент: [Дмитрий Ширченко](https://up.htmlacademy.ru/ecmascript/13/user/571125).
-* Наставник: `Неизвестно`.
+* Наставник: [Ruslan Malogulko](https://up.htmlacademy.ru/ecmascript/13/user/9728).
 
 ---
 
