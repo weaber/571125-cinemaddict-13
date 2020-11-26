@@ -68,7 +68,11 @@ const EMOTIONS = [
   `angry`
 ];
 
-const COUNTRIES = [`Russia`, `USA`, `Norway`];
+const COUNTRIES = [
+  `Russia`,
+  `USA`,
+  `Norway`
+];
 
 const generateDescription = () => {
   let AMOUNT = getRandomInt(1, 5);

@@ -65,7 +65,6 @@ if (films.length > FILMS_AMOUNT_PER_STEP) {
     if (renderedFilmsCount >= FILMS_AMOUNT) {
       showMoreButton.remove();
     }
-
   });
 }
 
