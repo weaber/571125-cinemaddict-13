@@ -21,8 +21,6 @@ const MOSTCOMMENTED_CARD_AMOUNT = 2;
 
 const films = new Array(FILMS_AMOUNT).fill().map(generateFilm);
 const filters = generateFilters(films);
-// console.log(films[0]);
-// console.log(filters);
 
 const render = (container, template, place) => {
   container.insertAdjacentHTML(place, template);
