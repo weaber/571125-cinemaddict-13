@@ -1,4 +1,4 @@
-import {createUserProfileTemplate} from "./view/user-profile.js";
+import UserProfileView from "./view/user-profile.js";
 import {createNavigationTemplate} from "./view/menu.js";
 import {createSortTemplate} from "./view/menu.js";
 import {createFilmsTemplate} from "./view/content-containers.js";
@@ -9,10 +9,10 @@ import {createFilmCardTemplate} from "./view/film-card.js";
 import {createShowmoreButtonTemplate} from "./view/showmore-button.js";
 import {createFooterStatisticsTemplate} from "./view/footer-statistics.js";
 import {generateFilm} from "./mock/film.js";
-import {getRandomInt} from "./mock/film.js";
+import {getRandomInt} from "./utils.js";
 import {generateFilters} from "./mock/filter.js";
 import {createPopupTemplate} from "./view/popup.js";
-import {renderTemplate} from "./utils.js";
+import {renderTemplate, renderElement, RenderPosition} from "./utils.js";
 
 const FILMS_AMOUNT = 24;
 
@@ -26,7 +26,7 @@ const filters = generateFilters(films);
 const watchedFilmsAmount = getRandomInt(0, FILMS_AMOUNT);
 
 const siteHeaderElement = document.querySelector(`.header`);
-renderTemplate(siteHeaderElement, createUserProfileTemplate(watchedFilmsAmount), `beforeend`);
+renderElement(siteHeaderElement, new UserProfileView(watchedFilmsAmount).getElement(), RenderPosition.BEFOREEND);
 
 const siteMainElement = document.querySelector(`.main`);
 renderTemplate(siteMainElement, createNavigationTemplate(filters), `beforeend`);
