@@ -1,6 +1,7 @@
+import {createElement} from "../utils.js";
 import dayjs from "dayjs";
 
-export const createPopupTemplate = (film) => {
+const createPopupTemplate = (film) => {
   const {
     name,
     poster,
@@ -38,8 +39,7 @@ export const createPopupTemplate = (film) => {
       angry: `./images/emoji/angry.png`
     };
 
-    return `
-    <li class="film-details__comment">
+    return `<li class="film-details__comment">
       <span class="film-details__comment-emoji">
         <img src=${EmotionPicsMap[emotion]} width="55" height="55" alt="emoji-smile">
       </span>
@@ -57,8 +57,7 @@ export const createPopupTemplate = (film) => {
 
   const commentsListTemplate = comments.map(commentTemplate).join(``);
 
-  return `
-  <section class="film-details">
+  return `<section class="film-details">
     <form class="film-details__inner" action="" method="get">
       <div class="film-details__top-container">
         <div class="film-details__close">
@@ -177,3 +176,26 @@ export const createPopupTemplate = (film) => {
   </section>
   `;
 };
+
+export default class Popup {
+  constructor(film) {
+    this._film = film;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createPopupTemplate(this._film);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
