@@ -3,9 +3,8 @@ import {createElement} from "../utils.js";
 const createUserProfileTemplate = (amount) => {
   let userTitle = ``;
   // Не нравится мне пока что такое количество else if
-  if (amount === 0) {
-    return ``;
-  } else if (amount >= 21) {
+
+  if (amount >= 21) {
     userTitle = `Movie Buff`;
   } else if (amount <= 10) {
     userTitle = `Novice`;
