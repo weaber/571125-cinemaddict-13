@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import {getRandomInt} from "../utils.js";
+import {getRandomInt} from "../utils/utils.js";
 
 const FILM_NAME = [
   `Made for each other`,
