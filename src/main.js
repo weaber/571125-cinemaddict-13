@@ -30,30 +30,32 @@ const watchedFilmsAmount = getRandomInt(0, FILMS_AMOUNT);
 
 const renderCard = (filmsListElement, film) => {
   const cardComponent = new FilmCardView(film);
-  const popupComponent = new PopupView(film);
 
   const showPopup = () => {
+    const popupComponent = new PopupView(film);
+
+    const closePopup = () => {
+      popupComponent.getElement().remove();
+      bodyElement.removeChild(popupComponent.getElement());
+      document.removeEventListener(`keydown`, popupEscPressHandler);
+    };
+
+    const popupEscPressHandler = (evt) => {
+      if (evt.key === `Escape`) {
+        evt.preventDefault();
+        closePopup();
+        document.removeEventListener(`keydown`, popupEscPressHandler);
+      }
+    };
+
+    popupComponent.setCloseClickHandler(closePopup);
     bodyElement.appendChild(popupComponent.getElement());
     document.addEventListener(`keydown`, popupEscPressHandler);
-  };
-
-  const closePopup = () => {
-    bodyElement.removeChild(popupComponent.getElement());
-    document.removeEventListener(`keydown`, popupEscPressHandler);
-  };
-
-  const popupEscPressHandler = (evt) => {
-    if (evt.key === `Escape`) {
-      evt.preventDefault();
-      closePopup();
-      document.removeEventListener(`keydown`, popupEscPressHandler);
-    }
   };
 
   cardComponent.setPosterClickHandler(showPopup);
   cardComponent.setTitleClickHandler(showPopup);
   cardComponent.setCommentsClickHandler(showPopup);
-  popupComponent.setCloseClickHandler(closePopup);
 
   renderElement(filmsListElement, cardComponent.getElement(), RenderPosition.BEFOREEND);
 };
