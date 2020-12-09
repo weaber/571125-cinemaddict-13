@@ -9,19 +9,23 @@ import MostCommentedView from "../view/mostcommented.js";
 
 import ShowMoreButtonView from "../view/showmore-button.js";
 import PopupView from "../view/popup.js";
-import {render, RenderPosition} from "../utils/render.js";
+import {render, RenderPosition, remove} from "../utils/render.js";
 
 const FILMS_AMOUNT_PER_STEP = 5;
 
 export default class MovieList {
   constructor(mainContainer) {
     this._mainContainer = mainContainer;
+    this._renderedFilmsAmount = FILMS_AMOUNT_PER_STEP;
 
     this._sortComponent = new SortView();
     this._filmsComponent = new FilmsContentView();
     this._mainFilmsListComponent = new MainFilmsListContentView();
     this._filmsListComponent = new FilmsListView();
     this._noFilmsComponent = new NoFilmsView();
+
+    this._showMoreButtonComponent = new ShowMoreButtonView();
+    this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
 
     this._topRatedComponent = new TopRatedView();
     this._topRatedFilmsListComponent = new FilmsListView();
@@ -76,24 +80,17 @@ export default class MovieList {
     .forEach((film) => this._renderCard(this._filmsListComponent, film));
   }
 
+  _handleShowMoreButtonClick() {
+    this._renderCards(this._renderedFilmsAmount, this._renderedFilmsAmount + FILMS_AMOUNT_PER_STEP);
+    this._renderedFilmsAmount += FILMS_AMOUNT_PER_STEP;
+    if (this._renderedFilmsAmount >= this._films.length) {
+      remove(this._showMoreButtonComponent);
+    }
+  }
+
   _renderShowMoreButton() {
-    let renderedFilmsCount = FILMS_AMOUNT_PER_STEP;
-    const showMoreButtonComponent = new ShowMoreButtonView();
-    render(this._mainFilmsListComponent, showMoreButtonComponent, RenderPosition.BEFOREEND);
-
-    showMoreButtonComponent.setClickHandler(() => {
-      this._films
-        .slice(renderedFilmsCount, renderedFilmsCount + FILMS_AMOUNT_PER_STEP)
-        .forEach((film) => this._renderCard(this._filmsListComponent, film));
-
-      renderedFilmsCount += FILMS_AMOUNT_PER_STEP;
-
-      if (renderedFilmsCount >= this._films.length) {
-        showMoreButtonComponent.getElement().remove();
-        showMoreButtonComponent.removeElement();
-      }
-    });
-
+    render(this._mainFilmsListComponent, this._showMoreButtonComponent, RenderPosition.BEFOREEND);
+    this._showMoreButtonComponent.setClickHandler(this._handleShowMoreButtonClick);
   }
 
   _renderSort() {
