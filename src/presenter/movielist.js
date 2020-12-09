@@ -3,12 +3,11 @@ import FilmsContentView from "../view/films-content-container.js";
 import MainFilmsListContentView from "../view/main-films-list.js";
 import NoFilmsView from "../view/no-films.js";
 import FilmsListView from "../view/films-list-container.js";
-import FilmCardView from "../view/film-card.js";
 import TopRatedView from "../view/toprated.js";
 import MostCommentedView from "../view/mostcommented.js";
 
 import ShowMoreButtonView from "../view/showmore-button.js";
-import PopupView from "../view/popup.js";
+import MovieCardPresenter from "./movie.js";
 import {render, RenderPosition, remove} from "../utils/render.js";
 
 const FILMS_AMOUNT_PER_STEP = 5;
@@ -41,43 +40,15 @@ export default class MovieList {
     this._renderMainContent(films);
   }
 
-  _renderCard(list, film) {
-    const bodyElement = document.querySelector(`body`);
-    const cardComponent = new FilmCardView(film);
-
-    const showPopup = () => {
-      const popupComponent = new PopupView(film);
-
-      const closePopup = () => {
-        popupComponent.getElement().remove();
-        bodyElement.removeChild(popupComponent.getElement());
-        document.removeEventListener(`keydown`, popupEscPressHandler);
-      };
-
-      const popupEscPressHandler = (evt) => {
-        if (evt.key === `Escape`) {
-          evt.preventDefault();
-          closePopup();
-          document.removeEventListener(`keydown`, popupEscPressHandler);
-        }
-      };
-
-      popupComponent.setCloseClickHandler(closePopup);
-      bodyElement.appendChild(popupComponent.getElement());
-      document.addEventListener(`keydown`, popupEscPressHandler);
-    };
-
-    cardComponent.setPosterClickHandler(showPopup);
-    cardComponent.setTitleClickHandler(showPopup);
-    cardComponent.setCommentsClickHandler(showPopup);
-
-    render(list, cardComponent, RenderPosition.BEFOREEND);
+  _renderCard(film) {
+    const cardPresenter = new MovieCardPresenter(this._filmsListComponent);
+    cardPresenter.init(film);
   }
 
   _renderCards(from, to) {
     this._films
     .slice(from, to)
-    .forEach((film) => this._renderCard(this._filmsListComponent, film));
+    .forEach((film) => this._renderCard(film));
   }
 
   _handleShowMoreButtonClick() {
@@ -106,11 +77,12 @@ export default class MovieList {
   _renderTopRated() {
     const MAX_TOPRATED_CARD_AMOUNT = 2;
     let topratedCardAmount = Math.min(MAX_TOPRATED_CARD_AMOUNT, this._films.length);
+
     render(this._filmsComponent, this._topRatedComponent, RenderPosition.BEFOREEND);
     render(this._topRatedComponent, this._topRatedFilmsListComponent, RenderPosition.BEFOREEND);
-    for (let i = 0; i < topratedCardAmount; i++) {
-      this._renderCard(this._topRatedFilmsListComponent, this._films[i]);
-    }
+
+    const TopRatedPresenter = new MovieCardPresenter(this._topRatedFilmsListComponent);
+    this._films.slice(0, topratedCardAmount).forEach((film) => TopRatedPresenter.init(film));
   }
 
   _renderMostCommented() {
@@ -118,9 +90,9 @@ export default class MovieList {
     let mostCommentedCardAmount = Math.min(MAX_MOSTCOMMENTED_CARD_AMOUNT, this._films.length);
     render(this._filmsComponent, this._mostCommentedComponent, RenderPosition.BEFOREEND);
     render(this._mostCommentedComponent, this._mostCommentedFilmsListComponent, RenderPosition.BEFOREEND);
-    for (let i = 0; i < mostCommentedCardAmount; i++) {
-      this._renderCard(this._mostCommentedFilmsListComponent, this._films[i]);
-    }
+
+    const MostCommentedPresenter = new MovieCardPresenter(this._mostCommentedFilmsListComponent);
+    this._films.slice(0, mostCommentedCardAmount).forEach((film) => MostCommentedPresenter.init(film));
   }
 
   _renderMainContent() {
