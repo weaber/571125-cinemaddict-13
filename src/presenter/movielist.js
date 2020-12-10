@@ -5,10 +5,10 @@ import NoFilmsView from "../view/no-films.js";
 import FilmsListView from "../view/films-list-container.js";
 import TopRatedView from "../view/toprated.js";
 import MostCommentedView from "../view/mostcommented.js";
-
 import ShowMoreButtonView from "../view/showmore-button.js";
 import MovieCardPresenter from "./movie.js";
 import {render, RenderPosition, remove} from "../utils/render.js";
+import {updateItem} from "../utils/utils.js";
 
 const FILMS_AMOUNT_PER_STEP = 5;
 
@@ -16,6 +16,8 @@ export default class MovieList {
   constructor(mainContainer) {
     this._mainContainer = mainContainer;
     this._renderedFilmsAmount = FILMS_AMOUNT_PER_STEP;
+
+    this._cardPresenter = {};
 
     this._sortComponent = new SortView();
     this._filmsComponent = new FilmsContentView();
@@ -25,6 +27,8 @@ export default class MovieList {
 
     this._showMoreButtonComponent = new ShowMoreButtonView();
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
+
+    this._handleCardChange = this._handleCardChange.bind(this);
 
     this._topRatedComponent = new TopRatedView();
     this._topRatedFilmsListComponent = new FilmsListView();
@@ -41,8 +45,23 @@ export default class MovieList {
   }
 
   _renderCard(film) {
-    const cardPresenter = new MovieCardPresenter(this._filmsListComponent);
+    const cardPresenter = new MovieCardPresenter(this._filmsListComponent, this._handleCardChange);
     cardPresenter.init(film);
+    this._cardPresenter[film.id] = cardPresenter;
+  }
+
+  _handleCardChange(updatedCard) {
+    this._films = updateItem(this._films, updatedCard);
+    this._cardPresenter[updatedCard.id].init(updatedCard);
+  }
+
+  _clearCardList() {
+    Object
+      .values(this._cardPresenter)
+      .forEach((presenter) => presenter.destroy());
+    this._cardPresenter = {};
+    this._renderedFilmsAmount = FILMS_AMOUNT_PER_STEP;
+    remove(this._showMoreButtonComponent);
   }
 
   _renderCards(from, to) {
@@ -81,8 +100,10 @@ export default class MovieList {
     render(this._filmsComponent, this._topRatedComponent, RenderPosition.BEFOREEND);
     render(this._topRatedComponent, this._topRatedFilmsListComponent, RenderPosition.BEFOREEND);
 
-    const TopRatedPresenter = new MovieCardPresenter(this._topRatedFilmsListComponent);
-    this._films.slice(0, topratedCardAmount).forEach((film) => TopRatedPresenter.init(film));
+    for (let i = 0; i < topratedCardAmount; i++) {
+      const TopRatedPresenter = new MovieCardPresenter(this._topRatedFilmsListComponent);
+      TopRatedPresenter.init(this._films[i]);
+    }
   }
 
   _renderMostCommented() {
@@ -91,8 +112,10 @@ export default class MovieList {
     render(this._filmsComponent, this._mostCommentedComponent, RenderPosition.BEFOREEND);
     render(this._mostCommentedComponent, this._mostCommentedFilmsListComponent, RenderPosition.BEFOREEND);
 
-    const MostCommentedPresenter = new MovieCardPresenter(this._mostCommentedFilmsListComponent);
-    this._films.slice(0, mostCommentedCardAmount).forEach((film) => MostCommentedPresenter.init(film));
+    for (let i = 0; i < mostCommentedCardAmount; i++) {
+      const MostCommentedPresenter = new MovieCardPresenter(this._mostCommentedFilmsListComponent);
+      MostCommentedPresenter.init(this._films[i]);
+    }
   }
 
   _renderMainContent() {

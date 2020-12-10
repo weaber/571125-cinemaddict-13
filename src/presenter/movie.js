@@ -1,11 +1,13 @@
 import FilmCardView from "../view/film-card.js";
 import PopupView from "../view/popup.js";
-import {render, RenderPosition} from "../utils/render.js";
+import {remove, render, RenderPosition, replace} from "../utils/render.js";
 
 export default class Movie {
-  constructor(movieListContainer) {
+  constructor(movieListContainer, changeData) {
     this._bodyElement = document.querySelector(`body`);
     this._movieListContainer = movieListContainer;
+
+    this._changeData = changeData;
 
     this._cardComponent = null;
     this._popupComponent = null;
@@ -13,10 +15,19 @@ export default class Movie {
     this._showPopup = this._showPopup.bind(this);
     this._closePopup = this._closePopup.bind(this);
     this._popupEscPressHandler = this._popupEscPressHandler.bind(this);
+
+    this._handleWatchlistClick = this._handleWatchlistClick.bind(this);
+    this._handleWatchedClick = this._handleWatchedClick.bind(this);
+    this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
   }
 
   init(film) {
     this._film = film;
+
+    const prevCardComponent = this._cardComponent;
+    // const prevPopupComponent = this._popupComponent;
+    // console.log(prevCardComponent);
+    // console.log(prevPopupComponent);
 
     this._cardComponent = new FilmCardView(film);
     this._popupComponent = new PopupView(film);
@@ -24,18 +35,36 @@ export default class Movie {
     this._cardComponent.setPosterClickHandler(this._showPopup);
     this._cardComponent.setTitleClickHandler(this._showPopup);
     this._cardComponent.setCommentsClickHandler(this._showPopup);
-    this._popupComponent.setCloseClickHandler(this._closePopup);
 
-    render(this._movieListContainer, this._cardComponent, RenderPosition.BEFOREEND);
+    this._cardComponent.setWatchlistClickHandler(this._handleWatchlistClick);
+    this._cardComponent.setWatchedClickHandler(this._handleWatchedClick);
+    this._cardComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+
+    if (prevCardComponent === null) {
+      render(this._movieListContainer, this._cardComponent, RenderPosition.BEFOREEND);
+      return;
+    }
+
+    if (this._movieListContainer.getElement().contains(prevCardComponent.getElement())) {
+      replace(this._cardComponent, prevCardComponent);
+    }
+  }
+
+  destroy() {
+    remove(this._cardComponent);
+    remove(this._popupComponent);
   }
 
   _showPopup() {
-    this._bodyElement.appendChild(this._popupComponent.getElement());
+    this._popupComponent.setCloseClickHandler(this._closePopup);
+    render(this._bodyElement, this._popupComponent, RenderPosition.BEFOREEND);
+    // this._bodyElement.appendChild(this._popupComponent.getElement());
     document.addEventListener(`keydown`, this._popupEscPressHandler);
   }
 
   _closePopup() {
-    this._bodyElement.removeChild(this._popupComponent.getElement());
+    remove(this._popupComponent);
+    // this._bodyElement.removeChild(this._popupComponent.getElement());
     document.removeEventListener(`keydown`, this._popupEscPressHandler);
   }
 
@@ -47,4 +76,39 @@ export default class Movie {
     }
   }
 
+  _handleWatchlistClick() {
+    this._changeData(
+        Object.assign(
+            {},
+            this._film,
+            {
+              isWatchlist: !this._film.isWatchlist
+            }
+        )
+    );
+  }
+
+  _handleWatchedClick() {
+    this._changeData(
+        Object.assign(
+            {},
+            this._film,
+            {
+              isWatched: !this._film.isWatched
+            }
+        )
+    );
+  }
+
+  _handleFavoriteClick() {
+    this._changeData(
+        Object.assign(
+            {},
+            this._film,
+            {
+              isFavorite: !this._film.isFavorite
+            }
+        )
+    );
+  }
 }
