@@ -2,15 +2,22 @@ import FilmCardView from "../view/film-card.js";
 import PopupView from "../view/popup.js";
 import {remove, render, RenderPosition, replace} from "../utils/render.js";
 
+const Mode = {
+  DEFAULT: `DEFAULT`,
+  POPUP: `POPUP`
+};
+
 export default class Movie {
-  constructor(movieListContainer, changeData) {
+  constructor(movieListContainer, changeData, changeMode) {
     this._bodyElement = document.querySelector(`body`);
     this._movieListContainer = movieListContainer;
 
     this._changeData = changeData;
+    this._changeMode = changeMode;
 
     this._cardComponent = null;
     this._popupComponent = null;
+    this._mode = Mode.DEFAULT;
 
     this._showPopup = this._showPopup.bind(this);
     this._closePopup = this._closePopup.bind(this);
@@ -58,21 +65,28 @@ export default class Movie {
     remove(this._popupComponent);
   }
 
-  _showPopup() {
-    this._popupComponent.setCloseClickHandler(this._closePopup);
+  resetView() {
+    if (this._mode !== Mode.DEFAULT) {
+      this._closePopup();
+    }
+  }
 
+  _showPopup() {
+    this._changeMode();
+    this._mode = Mode.POPUP;
+
+    this._popupComponent.setCloseClickHandler(this._closePopup);
     this._popupComponent.setWatchlistClickHandler(this._handleWatchlistClick);
     this._popupComponent.setWatchedClickHandler(this._handleWatchedClick);
     this._popupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
     render(this._bodyElement, this._popupComponent, RenderPosition.BEFOREEND);
-    // this._bodyElement.appendChild(this._popupComponent.getElement());
     document.addEventListener(`keydown`, this._popupEscPressHandler);
   }
 
   _closePopup() {
+    this._mode = Mode.DEFAULT;
     remove(this._popupComponent);
-    // this._bodyElement.removeChild(this._popupComponent.getElement());
     document.removeEventListener(`keydown`, this._popupEscPressHandler);
   }
 

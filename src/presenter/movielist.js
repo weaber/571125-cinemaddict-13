@@ -35,6 +35,8 @@ export default class MovieList {
 
     this._mostCommentedComponent = new MostCommentedView();
     this._mostCommentedFilmsListComponent = new FilmsListView();
+
+    this._handleModeChange = this._handleModeChange.bind(this);
   }
 
   init(films) {
@@ -45,9 +47,15 @@ export default class MovieList {
   }
 
   _renderCard(film) {
-    const cardPresenter = new MovieCardPresenter(this._filmsListComponent, this._handleCardChange);
+    const cardPresenter = new MovieCardPresenter(this._filmsListComponent, this._handleCardChange, this._handleModeChange);
     cardPresenter.init(film);
     this._cardPresenter[film.id] = cardPresenter;
+  }
+
+  _handleModeChange() {
+    Object
+      .values(this._cardPresenter)
+      .forEach((presenter) => presenter.resetView());
   }
 
   _handleCardChange(updatedCard) {
