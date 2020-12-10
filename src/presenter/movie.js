@@ -25,20 +25,18 @@ export default class Movie {
     this._film = film;
 
     const prevCardComponent = this._cardComponent;
-    // const prevPopupComponent = this._popupComponent;
-    // console.log(prevCardComponent);
-    // console.log(prevPopupComponent);
+    const prevPopupComponent = this._popupComponent;
 
     this._cardComponent = new FilmCardView(film);
-    this._popupComponent = new PopupView(film);
 
     this._cardComponent.setPosterClickHandler(this._showPopup);
     this._cardComponent.setTitleClickHandler(this._showPopup);
     this._cardComponent.setCommentsClickHandler(this._showPopup);
-
     this._cardComponent.setWatchlistClickHandler(this._handleWatchlistClick);
     this._cardComponent.setWatchedClickHandler(this._handleWatchedClick);
     this._cardComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+
+    this._popupComponent = new PopupView(film);
 
     if (prevCardComponent === null) {
       render(this._movieListContainer, this._cardComponent, RenderPosition.BEFOREEND);
@@ -47,6 +45,11 @@ export default class Movie {
 
     if (this._movieListContainer.getElement().contains(prevCardComponent.getElement())) {
       replace(this._cardComponent, prevCardComponent);
+    }
+
+    if (this._bodyElement.contains(prevPopupComponent.getElement())) {
+      remove(prevPopupComponent);
+      this._showPopup();
     }
   }
 
@@ -57,6 +60,11 @@ export default class Movie {
 
   _showPopup() {
     this._popupComponent.setCloseClickHandler(this._closePopup);
+
+    this._popupComponent.setWatchlistClickHandler(this._handleWatchlistClick);
+    this._popupComponent.setWatchedClickHandler(this._handleWatchedClick);
+    this._popupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+
     render(this._bodyElement, this._popupComponent, RenderPosition.BEFOREEND);
     // this._bodyElement.appendChild(this._popupComponent.getElement());
     document.addEventListener(`keydown`, this._popupEscPressHandler);
