@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 export const getRandomInt = (a = 1, b = 0) => {
   const lower = Math.ceil(Math.min(a, b));
   const upper = Math.floor(Math.max(a, b));
@@ -16,4 +18,34 @@ export const updateItem = (items, update) => {
     update,
     ...items.slice(index + 1)
   ];
+};
+
+const getWeightForNullDate = (filmA, filmB) => {
+  if (filmA === null && filmB === null) {
+    return 0;
+  }
+
+  if (filmA === null) {
+    return 1;
+  }
+
+  if (filmB === null) {
+    return -1;
+  }
+
+  return null;
+};
+
+export const sortByDate = (filmA, filmB) => {
+  const weight = getWeightForNullDate(filmA.date, filmB.date);
+
+  if (weight !== null) {
+    return weight;
+  }
+
+  return dayjs(filmA.date).diff(dayjs(filmB.date));
+};
+
+export const sortByRating = (filmA, filmB) => {
+  return filmA.rating - filmB.rating;
 };
