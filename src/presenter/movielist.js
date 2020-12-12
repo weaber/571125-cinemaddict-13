@@ -9,6 +9,9 @@ import ShowMoreButtonView from "../view/showmore-button.js";
 import MovieCardPresenter from "./movie.js";
 import {render, RenderPosition, remove} from "../utils/render.js";
 import {updateItem} from "../utils/utils.js";
+import {SortType} from "../const.js";
+import {sortByDate, sortByRating} from "../utils/utils.js";
+
 
 const FILMS_AMOUNT_PER_STEP = 5;
 
@@ -18,6 +21,7 @@ export default class MovieList {
     this._renderedFilmsAmount = FILMS_AMOUNT_PER_STEP;
 
     this._cardPresenter = {};
+    this._currentSortType = SortType.DEFAULT;
 
     this._sortComponent = new SortView();
     this._filmsComponent = new FilmsContentView();
@@ -37,10 +41,12 @@ export default class MovieList {
     this._mostCommentedFilmsListComponent = new FilmsListView();
 
     this._handleModeChange = this._handleModeChange.bind(this);
+    this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
 
   init(films) {
     this._films = films.slice();
+    this._sourceFilms = films.slice();
     this._renderSort();
     render(this._mainContainer, this._filmsComponent, RenderPosition.BEFOREEND);
     this._renderMainContent(films);
@@ -91,10 +97,42 @@ export default class MovieList {
     this._showMoreButtonComponent.setClickHandler(this._handleShowMoreButtonClick);
   }
 
-  _renderSort() {
-    if (this._films.length > 0) {
-      render(this._mainContainer, this._sortComponent, RenderPosition.BEFOREEND);
+  _sortFilms(sortType) {
+    switch (sortType) {
+      case SortType.DATE:
+        this._films.sort(sortByDate);
+        break;
+      case SortType.RATING:
+        this._films.sort(sortByRating);
+        break;
+      default:
+        this._films = this._sourceFilms.slice();
     }
+
+    this._currentSortType = sortType;
+    // - Очищаем список
+    this._clearCardList();
+    // - Рендерим список заново
+    this._renderCards(0, Math.min(this._films.length, FILMS_AMOUNT_PER_STEP));
+
+    if (this._films.length > FILMS_AMOUNT_PER_STEP) {
+      this._renderShowMoreButton();
+    }
+  }
+
+  _handleSortTypeChange(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+    this._sortFilms(sortType);
+  }
+
+  _renderSort() {
+    if (this._films.length === 0) {
+      return;
+    }
+    render(this._mainContainer, this._sortComponent, RenderPosition.BEFOREEND);
+    this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
   }
 
   _renderNoFilms() {

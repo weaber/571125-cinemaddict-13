@@ -9,6 +9,7 @@ import {render, RenderPosition} from "./utils/render.js";
 
 const FILMS_AMOUNT = getRandomInt(0, 23);
 const films = new Array(FILMS_AMOUNT).fill().map(generateFilm);
+
 const filters = generateFilters(films);
 const watchedFilmsAmount = getRandomInt(0, films.length);
 
