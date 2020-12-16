@@ -41,7 +41,7 @@ const createPopupTemplate = (film) => {
 
     return `<li class="film-details__comment">
       <span class="film-details__comment-emoji">
-        <img src=${EmotionPicsMap[emotion]} width="55" height="55" alt="emoji-smile">
+        <img src=${EmotionPicsMap[emotion]} width="55" height="55" alt="emoji-${emotion}">
       </span>
       <div>
         <p class="film-details__comment-text">${text}</p>
@@ -187,6 +187,10 @@ export default class Popup extends SmartView {
     this._watchlistClickHandler = this._watchlistClickHandler.bind(this);
     this._watchedClickHandler = this._watchedClickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
+
+    this._emojiClickHandler = this._emojiClickHandler.bind(this);
+
+    this.restoreHandlers();
   }
 
   getTemplate() {
@@ -218,6 +222,12 @@ export default class Popup extends SmartView {
     this._callback.favoriteClick();
   }
 
+  _emojiClickHandler(evt) {
+    evt.preventDefault();
+    console.log(evt.target.value);
+    this.updateElement();
+  }
+
   setWatchlistClickHandler(callback) {
     this._callback.watchlistClick = callback;
     this.getElement().querySelector(`.film-details__control-label--watchlist`).addEventListener(`click`, this._watchlistClickHandler);
@@ -233,25 +243,18 @@ export default class Popup extends SmartView {
     this.getElement().querySelector(`.film-details__control-label--favorite`).addEventListener(`click`, this._favoriteClickHandler);
   }
 
-  updateData(update) {
-    if (!update) {
-      return;
+  _setInnerHandlers() {
+    const emojies = this.getElement().querySelectorAll(`.film-details__emoji-item`);
+    for (let emoji of emojies) {
+      emoji.addEventListener(`click`, this._emojiClickHandler);
     }
-
-    this._data = Object.assign(
-        {},
-        this._data,
-        update
-    );
-
-    this.updateElement();
   }
 
-  updateElement() {
-    let prevElement = this.getElement();
-    const parent = prevElement.parentElement;
-    this.removeElement();
-    const newElement = this.getElement();
-    parent.replaceChild(newElement, prevElement);
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setCloseClickHandler(this._callback.closeClick);
+    this.setWatchlistClickHandler(this._callback.watchlistClick);
+    this.setWatchedClickHandler(this._callback.watchedClick);
+    this.setFavoriteClickHandler(this._callback.favoriteClick);
   }
 }
