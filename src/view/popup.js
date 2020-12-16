@@ -225,7 +225,8 @@ export default class Popup extends SmartView {
   _emojiClickHandler(evt) {
     evt.preventDefault();
     console.log(evt.target.value);
-    this.updateElement();
+    // Вот тут нужно вызвать this.updateData(измененные данные), заготовка написана в Smart'e
+    this.updateElement(); // а это стереть
   }
 
   setWatchlistClickHandler(callback) {

@@ -5,7 +5,7 @@ export default class Smart extends AbstractView {
     super();
     this._data = {};
   }
-
+  // Это заготовка из учебного проекта
   // updateData(update, justDataUpdating) {
   //   if (!update) {
   //     return;
