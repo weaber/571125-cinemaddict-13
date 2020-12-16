@@ -60,10 +60,10 @@ export default class Movie {
     }
   }
 
-  destroy() {
-    remove(this._cardComponent);
-    remove(this._popupComponent);
-  }
+  // destroy() {
+  //   remove(this._cardComponent);
+  //   remove(this._popupComponent);
+  // }
 
   resetView() {
     if (this._mode !== Mode.DEFAULT) {
