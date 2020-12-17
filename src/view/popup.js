@@ -1,7 +1,7 @@
 import SmartView from "./smart.js";
 import dayjs from "dayjs";
 
-const createPopupTemplate = (film) => {
+const createPopupTemplate = (data) => {
   const {
     name,
     poster,
@@ -18,8 +18,9 @@ const createPopupTemplate = (film) => {
     writers,
     actors,
     country,
-    comments
-  } = film;
+    comments,
+    newEmotion
+  } = data;
 
   const releaseDate = dayjs(filmDate).format(`DD MMMM YYYY`);
   const genresForm = (genres.length === 1) ? `Genre` : `Genres`;
@@ -29,15 +30,15 @@ const createPopupTemplate = (film) => {
 
   const isCheckedClass = (property) => property ? `checked` : ``;
 
+  const EmotionPicsMap = {
+    smile: `./images/emoji/smile.png`,
+    sleeping: `./images/emoji/sleeping.png`,
+    puke: `./images/emoji/puke.png`,
+    angry: `./images/emoji/angry.png`
+  };
+
   const commentTemplate = (comment) => {
     const {author, text, emotion, date} = comment;
-
-    const EmotionPicsMap = {
-      smile: `./images/emoji/smile.png`,
-      sleeping: `./images/emoji/sleeping.png`,
-      puke: `./images/emoji/puke.png`,
-      angry: `./images/emoji/angry.png`
-    };
 
     return `<li class="film-details__comment">
       <span class="film-details__comment-emoji">
@@ -56,6 +57,8 @@ const createPopupTemplate = (film) => {
   };
 
   const commentsListTemplate = comments.map(commentTemplate).join(``);
+
+  let newEmojiPicture = (newEmotion) ? `<img src=${EmotionPicsMap[newEmotion]} width="55" height="55" alt="emoji-${newEmotion}">` : ``;
 
   return `<section class="film-details">
     <form class="film-details__inner" action="" method="get">
@@ -142,7 +145,7 @@ const createPopupTemplate = (film) => {
           </ul>
 
           <div class="film-details__new-comment">
-            <div class="film-details__add-emoji-label"></div>
+            <div class="film-details__add-emoji-label">${newEmojiPicture}</div>
 
             <label class="film-details__comment-label">
               <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
@@ -180,7 +183,8 @@ const createPopupTemplate = (film) => {
 export default class Popup extends SmartView {
   constructor(film) {
     super();
-    this._film = film;
+    // this._film = film;
+    this._data = film;
 
     this._closeClickHandler = this._closeClickHandler.bind(this);
 
@@ -194,7 +198,7 @@ export default class Popup extends SmartView {
   }
 
   getTemplate() {
-    return createPopupTemplate(this._film);
+    return createPopupTemplate(this._data);
   }
 
   _closeClickHandler(evt) {
@@ -224,9 +228,14 @@ export default class Popup extends SmartView {
 
   _emojiClickHandler(evt) {
     evt.preventDefault();
-    console.log(evt.target.value);
-    // Вот тут нужно вызвать this.updateData(измененные данные), заготовка написана в Smart'e
-    this.updateElement(); // а это стереть
+    this._data = Object.assign(
+        {},
+        this._data,
+        {
+          newEmotion: evt.target.value,
+        }
+    );
+    this.updateElement();
   }
 
   setWatchlistClickHandler(callback) {
@@ -245,7 +254,7 @@ export default class Popup extends SmartView {
   }
 
   _setInnerHandlers() {
-    const emojies = this.getElement().querySelectorAll(`.film-details__emoji-item`);
+    let emojies = this.getElement().querySelectorAll(`.film-details__emoji-item`);
     for (let emoji of emojies) {
       emoji.addEventListener(`click`, this._emojiClickHandler);
     }

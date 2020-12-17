@@ -5,7 +5,7 @@ export default class Smart extends AbstractView {
     super();
     this._data = {};
   }
-  // Это заготовка из учебного проекта
+
   // updateData(update, justDataUpdating) {
   //   if (!update) {
   //     return;
@@ -26,12 +26,12 @@ export default class Smart extends AbstractView {
 
   updateElement() {
     let prevElement = this.getElement();
+    let currentScrollYPosition = prevElement.scrollTop;
     const parent = prevElement.parentElement;
-    console.log(`Апдейт!`);
     this.removeElement();
     const newElement = this.getElement();
     parent.replaceChild(newElement, prevElement);
-
+    newElement.scrollTo(0, currentScrollYPosition);
     this.restoreHandlers();
   }
 
