@@ -34,7 +34,7 @@ export default class Movie {
     const prevCardComponent = this._cardComponent;
     const prevPopupComponent = this._popupComponent;
 
-    this._cardComponent = new FilmCardView(film);
+    this._cardComponent = new FilmCardView(this._film);
 
     this._cardComponent.setPosterClickHandler(this._showPopup);
     this._cardComponent.setTitleClickHandler(this._showPopup);
@@ -43,7 +43,7 @@ export default class Movie {
     this._cardComponent.setWatchedClickHandler(this._handleWatchedClick);
     this._cardComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
-    this._popupComponent = new PopupView(film);
+    // this._popupComponent = new PopupView(this._film);
 
     if (prevCardComponent === null) {
       render(this._movieListContainer, this._cardComponent, RenderPosition.BEFOREEND);
@@ -60,10 +60,10 @@ export default class Movie {
     }
   }
 
-  destroy() {
-    remove(this._cardComponent);
-    remove(this._popupComponent);
-  }
+  // destroy() {
+  //   remove(this._cardComponent);
+  //   remove(this._popupComponent);
+  // }
 
   resetView() {
     if (this._mode !== Mode.DEFAULT) {
@@ -72,6 +72,7 @@ export default class Movie {
   }
 
   _showPopup() {
+    this._popupComponent = new PopupView(this._film);
     this._changeMode();
     this._mode = Mode.POPUP;
 
@@ -79,6 +80,8 @@ export default class Movie {
     this._popupComponent.setWatchlistClickHandler(this._handleWatchlistClick);
     this._popupComponent.setWatchedClickHandler(this._handleWatchedClick);
     this._popupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+
+    this._popupComponent.restoreHandlers();
 
     render(this._bodyElement, this._popupComponent, RenderPosition.BEFOREEND);
     document.addEventListener(`keydown`, this._popupEscPressHandler);

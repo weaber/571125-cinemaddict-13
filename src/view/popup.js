@@ -1,7 +1,7 @@
-import AbstractView from "./abstract.js";
+import SmartView from "./smart.js";
 import dayjs from "dayjs";
 
-const createPopupTemplate = (film) => {
+const createPopupTemplate = (data) => {
   const {
     name,
     poster,
@@ -18,8 +18,9 @@ const createPopupTemplate = (film) => {
     writers,
     actors,
     country,
-    comments
-  } = film;
+    comments,
+    newEmotion
+  } = data;
 
   const releaseDate = dayjs(filmDate).format(`DD MMMM YYYY`);
   const genresForm = (genres.length === 1) ? `Genre` : `Genres`;
@@ -29,19 +30,19 @@ const createPopupTemplate = (film) => {
 
   const isCheckedClass = (property) => property ? `checked` : ``;
 
+  const EmotionPicsMap = {
+    smile: `./images/emoji/smile.png`,
+    sleeping: `./images/emoji/sleeping.png`,
+    puke: `./images/emoji/puke.png`,
+    angry: `./images/emoji/angry.png`
+  };
+
   const commentTemplate = (comment) => {
     const {author, text, emotion, date} = comment;
 
-    const EmotionPicsMap = {
-      smile: `./images/emoji/smile.png`,
-      sleeping: `./images/emoji/sleeping.png`,
-      puke: `./images/emoji/puke.png`,
-      angry: `./images/emoji/angry.png`
-    };
-
     return `<li class="film-details__comment">
       <span class="film-details__comment-emoji">
-        <img src=${EmotionPicsMap[emotion]} width="55" height="55" alt="emoji-smile">
+        <img src=${EmotionPicsMap[emotion]} width="55" height="55" alt="emoji-${emotion}">
       </span>
       <div>
         <p class="film-details__comment-text">${text}</p>
@@ -56,6 +57,8 @@ const createPopupTemplate = (film) => {
   };
 
   const commentsListTemplate = comments.map(commentTemplate).join(``);
+
+  let newEmojiPicture = (newEmotion) ? `<img src=${EmotionPicsMap[newEmotion]} width="55" height="55" alt="emoji-${newEmotion}">` : ``;
 
   return `<section class="film-details">
     <form class="film-details__inner" action="" method="get">
@@ -142,7 +145,7 @@ const createPopupTemplate = (film) => {
           </ul>
 
           <div class="film-details__new-comment">
-            <div class="film-details__add-emoji-label"></div>
+            <div class="film-details__add-emoji-label">${newEmojiPicture}</div>
 
             <label class="film-details__comment-label">
               <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
@@ -177,20 +180,25 @@ const createPopupTemplate = (film) => {
   `;
 };
 
-export default class Popup extends AbstractView {
+export default class Popup extends SmartView {
   constructor(film) {
     super();
-    this._film = film;
+    // this._film = film;
+    this._data = film;
 
     this._closeClickHandler = this._closeClickHandler.bind(this);
 
     this._watchlistClickHandler = this._watchlistClickHandler.bind(this);
     this._watchedClickHandler = this._watchedClickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
+
+    this._emojiClickHandler = this._emojiClickHandler.bind(this);
+
+    this.restoreHandlers();
   }
 
   getTemplate() {
-    return createPopupTemplate(this._film);
+    return createPopupTemplate(this._data);
   }
 
   _closeClickHandler(evt) {
@@ -218,6 +226,18 @@ export default class Popup extends AbstractView {
     this._callback.favoriteClick();
   }
 
+  _emojiClickHandler(evt) {
+    evt.preventDefault();
+    this._data = Object.assign(
+        {},
+        this._data,
+        {
+          newEmotion: evt.target.value,
+        }
+    );
+    this.updateElement();
+  }
+
   setWatchlistClickHandler(callback) {
     this._callback.watchlistClick = callback;
     this.getElement().querySelector(`.film-details__control-label--watchlist`).addEventListener(`click`, this._watchlistClickHandler);
@@ -231,5 +251,20 @@ export default class Popup extends AbstractView {
   setFavoriteClickHandler(callback) {
     this._callback.favoriteClick = callback;
     this.getElement().querySelector(`.film-details__control-label--favorite`).addEventListener(`click`, this._favoriteClickHandler);
+  }
+
+  _setInnerHandlers() {
+    let emojies = this.getElement().querySelectorAll(`.film-details__emoji-item`);
+    for (let emoji of emojies) {
+      emoji.addEventListener(`click`, this._emojiClickHandler);
+    }
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setCloseClickHandler(this._callback.closeClick);
+    this.setWatchlistClickHandler(this._callback.watchlistClick);
+    this.setWatchedClickHandler(this._callback.watchedClick);
+    this.setFavoriteClickHandler(this._callback.favoriteClick);
   }
 }
