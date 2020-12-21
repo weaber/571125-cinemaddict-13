@@ -1,14 +1,17 @@
 import SmartView from "./smart.js";
 import dayjs from "dayjs";
 
+import relativeTime from "dayjs/plugin/relativeTime";
+dayjs.extend(relativeTime);
+
 const createPopupTemplate = (data) => {
   const {
     name,
     poster,
     description,
     rating,
-    date: filmDate, // с датой такая штука чтобы линтер не ругался, иначе есть date у фильма (23) и у комментария (36)
-    duration,
+    filmDate, // с датой такая штука чтобы линтер не ругался, иначе есть date у фильма (23) и у комментария (36)
+    filmDuration,
     genres,
     isWatchlist,
     isWatched,
@@ -48,7 +51,7 @@ const createPopupTemplate = (data) => {
         <p class="film-details__comment-text">${text}</p>
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${author}</span>
-          <span class="film-details__comment-day">${dayjs(date).format(`YYYY/MM/DD HH:mm`)}</span>
+          <span class="film-details__comment-day">${dayjs(date).fromNow()}</span>
           <button class="film-details__comment-delete">Delete</button>
         </p>
       </div>
@@ -59,6 +62,8 @@ const createPopupTemplate = (data) => {
   const commentsListTemplate = comments.map(commentTemplate).join(``);
 
   let newEmojiPicture = (newEmotion) ? `<img src=${EmotionPicsMap[newEmotion]} width="55" height="55" alt="emoji-${newEmotion}">` : ``;
+
+  const runtime = (filmDuration > 59) ? `${Math.floor(filmDuration / 60)}h ${filmDuration % 60}m` : `${filmDuration}m`;
 
   return `<section class="film-details">
     <form class="film-details__inner" action="" method="get">
@@ -104,7 +109,7 @@ const createPopupTemplate = (data) => {
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Runtime</td>
-                <td class="film-details__cell">${duration}</td>
+                <td class="film-details__cell">${runtime}</td>
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Country</td>

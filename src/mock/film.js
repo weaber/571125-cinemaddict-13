@@ -82,7 +82,7 @@ const generateFilmName = () => FILM_NAME[getRandomInt(FILM_NAME.length - 1)];
 const generateFilmPoster = () => FILM_POSTER[getRandomInt(FILM_POSTER.length - 1)];
 const generateRating = () => getRandomInt(0, 9) + getRandomInt(0, 10) / 10;
 const generateDate = (ago, period) => dayjs().add(getRandomInt(-ago, 0), period);
-const generateDuration = () => `${getRandomInt(0, 2)}h ${getRandomInt(0, 59)}m`;
+const generateDuration = () => getRandomInt(20, 150);
 const generateGenres = () => {
   let AMOUNT = getRandomInt(1, 3);
   let genres = [];
@@ -134,8 +134,8 @@ export const generateFilm = () => {
     director: generateName(),
     writers: generateName(getRandomInt(3)),
     actors: generateName(getRandomInt(3)),
-    date: generateDate(80, `year`),
-    duration: generateDuration(),
+    filmDate: generateDate(80, `year`),
+    filmDuration: generateDuration(),
     genres: generateGenres(),
     description: generateDescription(),
     country: generateCountry(),
