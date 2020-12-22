@@ -1,9 +1,12 @@
 import AbstractView from "./abstract.js";
 import dayjs from "dayjs";
 
+import duration from "dayjs/plugin/duration";
+dayjs.extend(duration);
+
 const createFilmCardTemplate = (film) => {
-  const {name, poster, description, rating, date, duration, genres, comments, isWatchlist, isWatched, isFavorite} = film;
-  const year = dayjs(date).format(`YYYY`);
+  const {name, poster, description, rating, filmDate, filmDuration, genres, comments, isWatchlist, isWatched, isFavorite} = film;
+  const year = dayjs(filmDate).format(`YYYY`);
   const isWatchlistClass = isWatchlist
     ? `film-card__controls-item--add-to-watchlist film-card__controls-item--active`
     : `film-card__controls-item--add-to-watchlist`;
@@ -21,12 +24,17 @@ const createFilmCardTemplate = (film) => {
     : `${description}`;
   const genre = genres[0];
 
+  // у меня почему-то не работает эта запись, хотя в консоли на сайте day.js.org работает
+  // const runtime = dayjs.duration(filmDuration, `minutes`).format(`H[h] mm[m]`);
+  // Решил пока так
+  const runtime = (filmDuration > 59) ? `${Math.floor(filmDuration / 60)}h ${filmDuration % 60}m` : `${filmDuration}m`;
+
   return `<article class="film-card">
     <h3 class="film-card__title">${name}</h3>
     <p class="film-card__rating">${rating}</p>
     <p class="film-card__info">
       <span class="film-card__year">${year}</span>
-      <span class="film-card__duration">${duration}</span>
+      <span class="film-card__duration">${runtime}</span>
       <span class="film-card__genre">${genre}</span>
     </p>
     <img src=${poster} alt="" class="film-card__poster">
