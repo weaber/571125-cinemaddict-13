@@ -29,7 +29,7 @@ const siteMainElement = document.querySelector(`.main`);
 render(siteMainElement, new MenuView(filters), RenderPosition.BEFOREEND);
 
 const movieListPresenter = new MovieListPresenter(siteMainElement, filmsModel);
-movieListPresenter.init(films);
+movieListPresenter.init();
 
 const footerStatisitcsElement = document.querySelector(`.footer__statistics`);
 render(footerStatisitcsElement, new FooterStatsView(films), RenderPosition.BEFOREEND);

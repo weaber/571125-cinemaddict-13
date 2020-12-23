@@ -46,15 +46,22 @@ export default class MovieList {
   }
 
   _getFilms() {
+    switch (this._currentSortType) {
+      case SortType.DATE:
+        return this._filmsModel.getFilms().slice().sort(sortByDate);
+      case SortType.RATING:
+        return this._filmsModel.getFilms().slice().sort(sortByRating);
+      // default:
+        // return this._filmsModel.getFilms().slice();
+    }
+
     return this._filmsModel.getFilms();
   }
 
-  init(films) {
-    this._films = films.slice();
-    this._sourceFilms = films.slice();
+  init() {
     this._renderSort();
     render(this._mainContainer, this._filmsComponent, RenderPosition.BEFOREEND);
-    this._renderMainContent(films);
+    this._renderMainContent();
   }
 
   _renderCard(film) {
@@ -70,7 +77,8 @@ export default class MovieList {
   }
 
   _handleCardChange(updatedCard) {
-    this._films = updateItem(this._films, updatedCard);
+    // this._films = updateItem(this._films, updatedCard);
+    // Здесь будем вызывать обновление модели
     this._cardPresenter[updatedCard.id].init(updatedCard);
   }
 
@@ -83,16 +91,19 @@ export default class MovieList {
     remove(this._showMoreButtonComponent);
   }
 
-  _renderCards(from, to) {
-    this._films
-    .slice(from, to)
-    .forEach((film) => this._renderCard(film));
+  _renderCards(films) {
+    films.forEach((film) => this._renderCard(film));
   }
 
   _handleShowMoreButtonClick() {
-    this._renderCards(this._renderedFilmsAmount, this._renderedFilmsAmount + FILMS_AMOUNT_PER_STEP);
-    this._renderedFilmsAmount += FILMS_AMOUNT_PER_STEP;
-    if (this._renderedFilmsAmount >= this._films.length) {
+    const filmsAmount = this._getFilms().length;
+    const newRenderedFilmsAmount = Math.min(filmsAmount, this._renderedFilmsAmount + FILMS_AMOUNT_PER_STEP);
+    const films = this._getFilms().slice(this._renderedFilmsAmount, newRenderedFilmsAmount);
+
+    this._renderCards(films);
+    this._renderedFilmsAmount = newRenderedFilmsAmount;
+
+    if (this._renderedFilmsAmount >= filmsAmount) {
       remove(this._showMoreButtonComponent);
     }
   }
@@ -102,38 +113,15 @@ export default class MovieList {
     this._showMoreButtonComponent.setClickHandler(this._handleShowMoreButtonClick);
   }
 
-  _sortFilms(sortType) {
-    switch (sortType) {
-      case SortType.DATE:
-        this._films.sort(sortByDate);
-        break;
-      case SortType.RATING:
-        this._films.sort(sortByRating);
-        break;
-      default:
-        this._films = this._sourceFilms.slice();
-    }
-
-    this._currentSortType = sortType;
-    // - Очищаем список
-    this._clearCardList();
-    // - Рендерим список заново
-    this._renderCards(0, Math.min(this._films.length, FILMS_AMOUNT_PER_STEP));
-
-    if (this._films.length > FILMS_AMOUNT_PER_STEP) {
-      this._renderShowMoreButton();
-    }
-  }
-
   _handleSortTypeChange(sortType) {
     if (this._currentSortType === sortType) {
       return;
     }
-    this._sortFilms(sortType);
+    this._currentSortType = sortType;
   }
 
   _renderSort() {
-    if (this._films.length === 0) {
+    if (this._getFilms().length === 0) {
       return;
     }
     render(this._mainContainer, this._sortComponent, RenderPosition.BEFOREEND);
@@ -169,8 +157,20 @@ export default class MovieList {
     }
   }
 
+  _renderFilmsList() {
+    const filmsAmount = this._getFilms().length;
+    const films = this._getFilms().slice(0, Math.min(filmsAmount, FILMS_AMOUNT_PER_STEP));
+
+    this._renderCards(films);
+
+    if (filmsAmount > FILMS_AMOUNT_PER_STEP) {
+      this._renderShowMoreButton();
+    }
+
+  }
+
   _renderMainContent() {
-    if (this._films.length === 0) {
+    if (this._getFilms().length === 0) {
       this._renderNoFilms();
       return;
     }
@@ -178,13 +178,9 @@ export default class MovieList {
     render(this._filmsComponent, this._mainFilmsListComponent, RenderPosition.BEFOREEND);
     render(this._mainFilmsListComponent, this._filmsListComponent, RenderPosition.BEFOREEND);
 
-    this._renderCards(0, Math.min(this._films.length, FILMS_AMOUNT_PER_STEP));
+    this._renderFilmsList();
 
-    if (this._films.length > FILMS_AMOUNT_PER_STEP) {
-      this._renderShowMoreButton();
-    }
-
-    this._renderTopRated();
-    this._renderMostCommented();
+    // this._renderTopRated();
+    // this._renderMostCommented();
   }
 }
