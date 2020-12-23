@@ -16,7 +16,8 @@ import {sortByDate, sortByRating} from "../utils/utils.js";
 const FILMS_AMOUNT_PER_STEP = 5;
 
 export default class MovieList {
-  constructor(mainContainer) {
+  constructor(mainContainer, filmsModel) {
+    this._filmsModel = filmsModel;
     this._mainContainer = mainContainer;
     this._renderedFilmsAmount = FILMS_AMOUNT_PER_STEP;
 
@@ -42,6 +43,10 @@ export default class MovieList {
 
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
+  }
+
+  _getFilms() {
+    return this._filmsModel.getFilms();
   }
 
   init(films) {
