@@ -26,12 +26,6 @@ export default class Sort extends AbstractView {
       return;
     }
 
-    const sortTypeLinks = this.getElement().querySelectorAll(`A`);
-    for (let link of sortTypeLinks) {
-      link.classList.remove(`sort__button--active`);
-    }
-    evt.target.classList.add(`sort__button--active`);
-
     evt.preventDefault();
     this._callback.sortTypeChange(evt.target.dataset.sortType);
   }

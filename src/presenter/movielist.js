@@ -54,8 +54,6 @@ export default class MovieList {
         return this._filmsModel.getFilms().slice().sort(sortByDate);
       case SortType.RATING:
         return this._filmsModel.getFilms().slice().sort(sortByRating);
-      // default:
-        // return this._filmsModel.getFilms().slice();
     }
 
     return this._filmsModel.getFilms();
@@ -127,7 +125,6 @@ export default class MovieList {
     if (resetSortType) {
       this._currentSortType = SortType.DEFAULT;
     }
-
   }
 
   _renderCards(films) {
@@ -204,18 +201,6 @@ export default class MovieList {
       const MostCommentedPresenter = new MovieCardPresenter(this._mostCommentedFilmsListComponent);
       MostCommentedPresenter.init(this._films[i]);
     }
-  }
-
-  _renderFilmsList() {
-    const filmsAmount = this._getFilms().length;
-    const films = this._getFilms().slice(0, Math.min(filmsAmount, FILMS_AMOUNT_PER_STEP));
-
-    this._renderCards(films);
-
-    if (filmsAmount > FILMS_AMOUNT_PER_STEP) {
-      this._renderShowMoreButton();
-    }
-
   }
 
   _renderMainContent() {
