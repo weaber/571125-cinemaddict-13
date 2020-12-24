@@ -55,9 +55,11 @@ export default class Movie {
       replace(this._cardComponent, prevCardComponent);
     }
 
-    if (this._bodyElement.contains(prevPopupComponent.getElement())) {
-      remove(prevPopupComponent);
-      this._showPopup();
+    if (prevPopupComponent) {
+      if (this._bodyElement.contains(prevPopupComponent.getElement())) {
+        remove(prevPopupComponent);
+        this._showPopup();
+      }
     }
   }
 
