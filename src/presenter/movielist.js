@@ -8,8 +8,7 @@ import MostCommentedView from "../view/mostcommented.js";
 import ShowMoreButtonView from "../view/showmore-button.js";
 import MovieCardPresenter from "./movie.js";
 import {render, RenderPosition, remove} from "../utils/render.js";
-// import {updateItem} from "../utils/utils.js";
-import {SortType} from "../const.js";
+import {SortType, UserAction, UpdateType} from "../const.js";
 import {sortByDate, sortByRating} from "../utils/utils.js";
 
 
@@ -17,6 +16,9 @@ const FILMS_AMOUNT_PER_STEP = 5;
 
 export default class MovieList {
   constructor(mainContainer, filmsModel) {
+    this._showMoreButtonComponent = null;
+    this._sortComponent = null;
+
     this._filmsModel = filmsModel;
     this._mainContainer = mainContainer;
     this._renderedFilmsAmount = FILMS_AMOUNT_PER_STEP;
@@ -24,16 +26,13 @@ export default class MovieList {
     this._cardPresenter = {};
     this._currentSortType = SortType.DEFAULT;
 
-    this._sortComponent = new SortView();
     this._filmsComponent = new FilmsContentView();
     this._mainFilmsListComponent = new MainFilmsListContentView();
     this._filmsListComponent = new FilmsListView();
     this._noFilmsComponent = new NoFilmsView();
 
-    this._showMoreButtonComponent = new ShowMoreButtonView();
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
 
-    // this._handleCardChange = this._handleCardChange.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
 
@@ -63,8 +62,6 @@ export default class MovieList {
   }
 
   init() {
-    this._renderSort();
-    render(this._mainContainer, this._filmsComponent, RenderPosition.BEFOREEND);
     this._renderMainContent();
   }
 
@@ -80,35 +77,57 @@ export default class MovieList {
       .forEach((presenter) => presenter.resetView());
   }
 
-  // _handleCardChange(updatedCard) {
-  //   // this._films = updateItem(this._films, updatedCard);
-  //   // Здесь будем вызывать обновление модели
-  //   this._cardPresenter[updatedCard.id].init(updatedCard);
-  // }
-
   _handleViewAction(actionType, updateType, update) {
-    console.log(actionType, updateType, update);
+    // console.log(`Клик View`);
+    // console.log(actionType, updateType, update);
     // Здесь будем вызывать обновление модели.
     // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
     // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
     // update - обновленные данные
+    switch (actionType) {
+      case UserAction.UPDATE_FILM:
+        this._filmsModel.updateFilm(updateType, update);
+        break;
+    }
   }
 
   _handleModelEvent(updateType, data) {
-    console.log(updateType, data);
-    // В зависимости от типа изменений решаем, что делать:
-    // - обновить часть списка (например, когда поменялось описание)
-    // - обновить список (например, когда задача ушла в архив)
-    // - обновить всю доску (например, при переключении фильтра)
+    // console.log(`Модель`);
+    // console.log(updateType, data);
+    switch (updateType) {
+      case UpdateType.PATCH:
+      // Перерисовываю конкретную карточку фильма (по клику на isWatched etc)
+        this._cardPresenter[data.id].init(data);
+        break;
+      case UpdateType.MINOR:
+      // Тут пока про запас
+        break;
+      case UpdateType.MAJOR:
+        this._clearMainContent({resetRenderedFilmsAmount: true, resetSortType: false});
+        this._renderMainContent();
+        break;
+    }
   }
 
-  _clearCardList() {
+  _clearMainContent({resetRenderedFilmsAmount = false, resetSortType = false} = {}) {
+    // const filmsAmount = this._getFilms().length;
     Object
       .values(this._cardPresenter)
       .forEach((presenter) => presenter.destroy());
+
     this._cardPresenter = {};
-    this._renderedFilmsAmount = FILMS_AMOUNT_PER_STEP;
+    remove(this._noFilmsComponent);
+    remove(this._sortComponent);
     remove(this._showMoreButtonComponent);
+
+    if (resetRenderedFilmsAmount) {
+      this._renderedFilmsAmount = FILMS_AMOUNT_PER_STEP;
+    }
+
+    if (resetSortType) {
+      this._currentSortType = SortType.DEFAULT;
+    }
+
   }
 
   _renderCards(films) {
@@ -129,8 +148,13 @@ export default class MovieList {
   }
 
   _renderShowMoreButton() {
-    render(this._mainFilmsListComponent, this._showMoreButtonComponent, RenderPosition.BEFOREEND);
+    if (this._showMoreButtonComponent !== null) {
+      this._showMoreButtonComponent = null;
+    }
+
+    this._showMoreButtonComponent = new ShowMoreButtonView();
     this._showMoreButtonComponent.setClickHandler(this._handleShowMoreButtonClick);
+    render(this._mainFilmsListComponent, this._showMoreButtonComponent, RenderPosition.BEFOREEND);
   }
 
   _handleSortTypeChange(sortType) {
@@ -138,14 +162,19 @@ export default class MovieList {
       return;
     }
     this._currentSortType = sortType;
+    // console.log(this._renderedFilmsAmount);
+    this._clearMainContent({resetRenderedFilmsAmount: true});
+    // console.log(this._renderedFilmsAmount);
+    this._renderMainContent();
   }
 
-  _renderSort() {
-    if (this._getFilms().length === 0) {
-      return;
+  _renderSortComponent() {
+    if (this._sortComponent !== null) {
+      this._sortComponent = null;
     }
-    render(this._mainContainer, this._sortComponent, RenderPosition.BEFOREEND);
+    this._sortComponent = new SortView(this._currentSortType);
     this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
+    render(this._mainContainer, this._sortComponent, RenderPosition.BEFOREEND);
   }
 
   _renderNoFilms() {
@@ -190,15 +219,26 @@ export default class MovieList {
   }
 
   _renderMainContent() {
-    if (this._getFilms().length === 0) {
+    const films = this._getFilms();
+    const filmsAmount = films.length;
+
+    if (filmsAmount === 0) {
+      render(this._mainContainer, this._filmsComponent, RenderPosition.BEFOREEND);
       this._renderNoFilms();
       return;
     }
 
+    this._renderSortComponent();
+    render(this._mainContainer, this._filmsComponent, RenderPosition.BEFOREEND);
+
     render(this._filmsComponent, this._mainFilmsListComponent, RenderPosition.BEFOREEND);
     render(this._mainFilmsListComponent, this._filmsListComponent, RenderPosition.BEFOREEND);
 
-    this._renderFilmsList();
+    this._renderCards(films.slice(0, Math.min(filmsAmount, this._renderedFilmsAmount)));
+
+    if (filmsAmount > this._renderedFilmsAmount) {
+      this._renderShowMoreButton();
+    }
 
     // this._renderTopRated();
     // this._renderMostCommented();
