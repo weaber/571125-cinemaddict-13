@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import {FilterType} from "../const.js";
 
 export const getRandomInt = (a = 1, b = 0) => {
   const lower = Math.ceil(Math.min(a, b));
@@ -34,4 +35,11 @@ export const sortByDate = (filmA, filmB) => {
 
 export const sortByRating = (filmA, filmB) => {
   return filmA.rating - filmB.rating;
+};
+
+export const filter = {
+  [FilterType.ALL]: (films) => films.filter((film) => film.id),
+  [FilterType.WATCHLIST]: (films) => films.filter((film) => film.isWatchlist),
+  [FilterType.HISTORY]: (films) => films.filter((film) => film.isWatched),
+  [FilterType.FAVORITES]: (films) => films.filter((film) => film.isFavorite),
 };

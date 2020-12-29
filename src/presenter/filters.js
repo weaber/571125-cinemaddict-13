@@ -1,6 +1,7 @@
 import FiltersView from "../view/filters.js";
-import {render, RenderPosition, remove} from "../utils/render.js";
-import {FilterType} from "../const.js";
+import {render, RenderPosition, remove, replace} from "../utils/render.js";
+import {FilterType, UpdateType} from "../const.js";
+import {filter} from "../utils/utils.js";
 
 export default class Filters {
   constructor(filtersContainer, filtersModel, filmsModel) {
@@ -11,11 +12,11 @@ export default class Filters {
     this._currentFilter = null;
     this._filtersComponent = null;
 
-    // this._handleModelEvent = this._handleModelEvent.bind(this);
-    // this._handleFilterTypeChange = this._handleFilterTypeChange.bind(this);
+    this._handleModelEvent = this._handleModelEvent.bind(this);
+    this._handleFilterTypeChange = this._handleFilterTypeChange.bind(this);
 
-    // this._filmsModel.addObserver(this._handleModelEvent);
-    // this._filtersModel.addObserver(this._handleFilterTypeChange);
+    this._filmsModel.addObserver(this._handleModelEvent);
+    this._filtersModel.addObserver(this._handleModelEvent);
   }
 
   init() {
@@ -25,37 +26,50 @@ export default class Filters {
     const prevFiltersComponent = this._filtersComponent;
 
     this._filtersComponent = new FiltersView(filters, this._currentFilter);
-    // this._filtersComponent.setFilterTypeChangeHandler(this._handleFilterTypeChange);
+    this._filtersComponent.setFilterTypeChangeHandler(this._handleFilterTypeChange);
 
     if (prevFiltersComponent === null) {
       render(this._filtersContainer, this._filtersComponent, RenderPosition.BEFOREEND);
       return;
     }
-    console.log(filters);
+
+    replace(this._filtersComponent, prevFiltersComponent);
+    remove(prevFiltersComponent);
+  }
+
+  _handleModelEvent() {
+    this.init();
+  }
+
+  _handleFilterTypeChange(filterType) {
+    if (this._currentFilter === filterType) {
+      return;
+    }
+    this._filtersModel.setFilter(UpdateType.MAJOR, filterType);
   }
 
   _getFilters() {
     const films = this._filmsModel.getFilms();
     return [
       {
-        type: `all`,
+        type: FilterType.ALL,
         name: `All movies`,
-        count: films.length
+        count: filter[FilterType.ALL](films).length
       },
       {
-        type: `watchlist`,
+        type: FilterType.WATCHLIST,
         name: `Watchlist`,
-        count: films.filter((film) => film.isWatchlist).length
+        count: filter[FilterType.WATCHLIST](films).length
       },
       {
-        type: `history`,
+        type: FilterType.HISTORY,
         name: `History`,
-        count: films.filter((film) => film.isWatched).length
+        count: filter[FilterType.HISTORY](films).length
       },
       {
-        type: `favorites`,
+        type: FilterType.FAVORITES,
         name: `Favorites`,
-        count: films.filter((film) => film.isFavorite).length
+        count: filter[FilterType.FAVORITES](films).length
       }
     ];
   }
