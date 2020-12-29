@@ -29,7 +29,7 @@ if (films.length > 0 && watchedFilmsAmount > 0) {
 const siteMainElement = document.querySelector(`.main`);
 
 const filtersPresenter = new FiltersPresenter(siteMainElement, filtersModel, filmsModel);
-const movieListPresenter = new MovieListPresenter(siteMainElement, filmsModel);
+const movieListPresenter = new MovieListPresenter(siteMainElement, filmsModel, filtersModel);
 filtersPresenter.init();
 movieListPresenter.init();
 

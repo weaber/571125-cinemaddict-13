@@ -9,17 +9,18 @@ import ShowMoreButtonView from "../view/showmore-button.js";
 import MovieCardPresenter from "./movie.js";
 import {render, RenderPosition, remove} from "../utils/render.js";
 import {SortType, UserAction, UpdateType} from "../const.js";
-import {sortByDate, sortByRating} from "../utils/utils.js";
+import {filter, sortByDate, sortByRating} from "../utils/utils.js";
 
 
 const FILMS_AMOUNT_PER_STEP = 5;
 
 export default class MovieList {
-  constructor(mainContainer, filmsModel) {
+  constructor(mainContainer, filmsModel, filtersModel) {
     this._showMoreButtonComponent = null;
     this._sortComponent = null;
 
     this._filmsModel = filmsModel;
+    this._filtersModel = filtersModel;
     this._mainContainer = mainContainer;
     this._renderedFilmsAmount = FILMS_AMOUNT_PER_STEP;
 
@@ -46,17 +47,22 @@ export default class MovieList {
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
 
     this._filmsModel.addObserver(this._handleModelEvent);
+    this._filtersModel.addObserver(this._handleModelEvent);
   }
 
   _getFilms() {
+    const filterType = this._filtersModel.getFilter();
+    const films = this._filmsModel.getFilms();
+    const filteredFilms = filter[filterType](films);
+
     switch (this._currentSortType) {
       case SortType.DATE:
-        return this._filmsModel.getFilms().slice().sort(sortByDate);
+        return filteredFilms.sort(sortByDate);
       case SortType.RATING:
-        return this._filmsModel.getFilms().slice().sort(sortByRating);
+        return filteredFilms.sort(sortByRating);
     }
 
-    return this._filmsModel.getFilms();
+    return filteredFilms;
   }
 
   init() {
