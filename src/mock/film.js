@@ -111,6 +111,7 @@ const generateComments = () => {
     const generateText = () => FILM_DESCRIPTION[getRandomInt(FILM_DESCRIPTION.length - 1)];
     const generateEmotion = () => EMOTIONS[getRandomInt(EMOTIONS.length - 1)];
     return {
+      id: generateId(),
       text: generateText(),
       emotion: generateEmotion(),
       author: generateName(),

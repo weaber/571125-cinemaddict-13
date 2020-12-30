@@ -24,9 +24,6 @@ const createFilmCardTemplate = (film) => {
     : `${description}`;
   const genre = genres[0];
 
-  // у меня почему-то не работает эта запись, хотя в консоли на сайте day.js.org работает
-  // const runtime = dayjs.duration(filmDuration, `minutes`).format(`H[h] mm[m]`);
-  // Решил пока так
   const runtime = (filmDuration > 59) ? `${Math.floor(filmDuration / 60)}h ${filmDuration % 60}m` : `${filmDuration}m`;
 
   return `<article class="film-card">

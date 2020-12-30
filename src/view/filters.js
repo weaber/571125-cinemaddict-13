@@ -11,7 +11,7 @@ const createFilterItemTemplate = (filter, currentFilterType) => {
 
 const createNavigationTemplate = (filterItems, currentFilterType) => {
   const filterItemsTemplate = filterItems
-    .map((filter) => createFilterItemTemplate(filter, currentFilterType))
+    .map((filterItem) => createFilterItemTemplate(filterItem, currentFilterType))
     .join(``);
 
   return `<nav class="main-navigation">

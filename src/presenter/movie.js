@@ -33,7 +33,7 @@ export default class Movie {
     this._film = film;
 
     const prevCardComponent = this._cardComponent;
-    const prevPopupComponent = this._popupComponent;
+    // const prevPopupComponent = this._popupComponent;
 
     this._cardComponent = new FilmCardView(this._film);
 
@@ -44,8 +44,6 @@ export default class Movie {
     this._cardComponent.setWatchedClickHandler(this._handleWatchedClick);
     this._cardComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
-    // this._popupComponent = new PopupView(this._film);
-
     if (prevCardComponent === null) {
       render(this._movieListContainer, this._cardComponent, RenderPosition.BEFOREEND);
       return;
@@ -55,17 +53,16 @@ export default class Movie {
       replace(this._cardComponent, prevCardComponent);
     }
 
-    if (prevPopupComponent) {
-      if (this._bodyElement.contains(prevPopupComponent.getElement())) {
-        remove(prevPopupComponent);
-        this._showPopup();
-      }
-    }
+    // if (prevPopupComponent) {
+    //   if (this._bodyElement.contains(prevPopupComponent.getElement())) {
+    //     remove(prevPopupComponent);
+    //     this._showPopup();
+    //   }
+    // }
   }
 
   destroy() {
     remove(this._cardComponent);
-    // remove(this._popupComponent);
   }
 
   resetView() {
@@ -76,22 +73,22 @@ export default class Movie {
 
   _showPopup() {
     this._popupComponent = new PopupView(this._film);
-    this._changeMode();
-    this._mode = Mode.POPUP;
+    // this._changeMode();
+    // this._mode = Mode.POPUP;
 
     this._popupComponent.setCloseClickHandler(this._closePopup);
-    this._popupComponent.setWatchlistClickHandler(this._handleWatchlistClick);
-    this._popupComponent.setWatchedClickHandler(this._handleWatchedClick);
-    this._popupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+    // this._popupComponent.setWatchlistClickHandler(this._handleWatchlistClick);
+    // this._popupComponent.setWatchedClickHandler(this._handleWatchedClick);
+    // this._popupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
-    this._popupComponent.restoreHandlers();
+    // this._popupComponent.restoreHandlers();
 
     render(this._bodyElement, this._popupComponent, RenderPosition.BEFOREEND);
     document.addEventListener(`keydown`, this._popupEscPressHandler);
   }
 
   _closePopup() {
-    this._mode = Mode.DEFAULT;
+    // this._mode = Mode.DEFAULT;
     remove(this._popupComponent);
     document.removeEventListener(`keydown`, this._popupEscPressHandler);
   }
