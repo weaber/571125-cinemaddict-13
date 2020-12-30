@@ -3,11 +3,17 @@ import Observer from "./observer.js";
 export default class Comments extends Observer {
   constructor() {
     super();
-    this._comments = [];
+    this._comments = {};
   }
 
-  setComments() {
-
+  setComments(comments) {
+    if (!comments) {
+      return;
+    }
+    this._comments = Object.assign(
+        {},
+        comments
+    );
   }
 
   getComments() {

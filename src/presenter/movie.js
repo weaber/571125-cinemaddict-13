@@ -3,6 +3,7 @@ import PopupView from "../view/popup.js";
 import {remove, render, RenderPosition, replace} from "../utils/render.js";
 import {UserAction, UpdateType} from "../const.js";
 import {commentsCollection} from "../mock/film.js";
+import CommentsModel from "../model/comments.js";
 
 const Mode = {
   DEFAULT: `DEFAULT`,
@@ -73,7 +74,9 @@ export default class Movie {
   }
 
   _showPopup() {
-    this._popupComponent = new PopupView(this._film, commentsCollection);
+    this._commentsModel = new CommentsModel();
+    this._commentsModel.setComments(commentsCollection);
+    this._popupComponent = new PopupView(this._film, this._commentsModel.getComments());
     this._changeMode();
     this._mode = Mode.POPUP;
 
