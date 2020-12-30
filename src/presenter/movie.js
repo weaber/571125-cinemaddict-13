@@ -2,6 +2,7 @@ import FilmCardView from "../view/film-card.js";
 import PopupView from "../view/popup.js";
 import {remove, render, RenderPosition, replace} from "../utils/render.js";
 import {UserAction, UpdateType} from "../const.js";
+import {commentsCollection} from "../mock/film.js";
 
 const Mode = {
   DEFAULT: `DEFAULT`,
@@ -72,7 +73,7 @@ export default class Movie {
   }
 
   _showPopup() {
-    this._popupComponent = new PopupView(this._film);
+    this._popupComponent = new PopupView(this._film, commentsCollection);
     this._changeMode();
     this._mode = Mode.POPUP;
 

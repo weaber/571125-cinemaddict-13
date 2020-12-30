@@ -112,7 +112,7 @@ const EmotionPicsMap = {
   angry: `./images/emoji/angry.png`
 };
 
-const createCommentsTemplate = (data) => {
+const createCommentsTemplate = (data, commentsCollection) => {
   const {comments} = data;
 
   const createCommentTemplate = (comment) => {
@@ -133,7 +133,8 @@ const createCommentsTemplate = (data) => {
     </li>
     `;
   };
-  return comments.map(createCommentTemplate).join(``);
+  // return commentsCollection.map(createCommentTemplate).join(``);
+  return comments.map((item) => createCommentTemplate(commentsCollection[item])).join(` `);
 };
 
 const createNewCommentTemplate = (data) => {
@@ -176,14 +177,14 @@ const createNewCommentTemplate = (data) => {
 
 };
 
-const createPopupTemplate = (data) => {
+const createPopupTemplate = (data, commentsCollection) => {
   const {
     comments
   } = data;
 
   const filmDetailsInfoTemplate = createFilmDetailsInfoTemplate(data);
   const filmDetailsControlsTemplate = createFilmDetailsControlsTemplate(data);
-  const commentsTemplate = createCommentsTemplate(data);
+  const commentsTemplate = createCommentsTemplate(data, commentsCollection);
   const newCommentTemplate = createNewCommentTemplate(data);
 
   return `<section class="film-details">
@@ -218,9 +219,10 @@ const createPopupTemplate = (data) => {
 };
 
 export default class Popup extends SmartView {
-  constructor(film) {
+  constructor(film, commentsCollection) {
     super();
     this._data = film;
+    this._commentsCollection = commentsCollection;
 
     this._closeClickHandler = this._closeClickHandler.bind(this);
 
@@ -235,7 +237,7 @@ export default class Popup extends SmartView {
   }
 
   getTemplate() {
-    return createPopupTemplate(this._data);
+    return createPopupTemplate(this._data, this._commentsCollection);
   }
 
   _closeClickHandler(evt) {
