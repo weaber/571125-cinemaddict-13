@@ -105,25 +105,40 @@ const generateName = (amount) => {
 const generateAge = () => `${getRandomInt(0, 18)}+`;
 const generateCountry = () => COUNTRIES[getRandomInt(COUNTRIES.length - 1)];
 
-const generateComments = () => {
-  const AMOUNT = getRandomInt(0, 5);
-  const generateComment = () => {
-    const generateText = () => FILM_DESCRIPTION[getRandomInt(FILM_DESCRIPTION.length - 1)];
-    const generateEmotion = () => EMOTIONS[getRandomInt(EMOTIONS.length - 1)];
-    return {
-      id: generateId(),
-      text: generateText(),
-      emotion: generateEmotion(),
-      author: generateName(),
-      date: generateDate(30, `days`)
-    };
-  };
+const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
 
-  const comments = new Array(AMOUNT).fill().map(generateComment);
+const generateComment = () => {
+  const generateText = () => FILM_DESCRIPTION[getRandomInt(FILM_DESCRIPTION.length - 1)];
+  const generateEmotion = () => EMOTIONS[getRandomInt(EMOTIONS.length - 1)];
+  return {
+    idMessage: generateId(),
+    text: generateText(),
+    emotion: generateEmotion(),
+    date: generateDate(30, `days`),
+    author: generateName()
+  };
+};
+
+const generateComments = (amount) => {
+  let comments = {};
+  for (let i = 0; i < amount; i++) {
+    let comment = generateComment();
+    comments[comment.idMessage] = comment;
+  }
   return comments;
 };
 
-const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
+export const commentsCollection = generateComments(25);
+
+const getComments = () => {
+  const commentQuantity = getRandomInt(0, 5);
+  const comments = [];
+  let commentsArray = Object.keys(commentsCollection);
+  for (let i = 0; i < commentQuantity; i++) {
+    comments.push(commentsArray[getRandomInt(0, commentsArray.length - 1)]);
+  }
+  return comments;
+};
 
 export const generateFilm = () => {
   return {
@@ -144,6 +159,6 @@ export const generateFilm = () => {
     isWatchlist: Boolean(getRandomInt(0, 1)),
     isWatched: Boolean(getRandomInt(0, 1)),
     isFavorite: Boolean(getRandomInt(0, 1)),
-    comments: generateComments()
+    comments: getComments()
   };
 };
