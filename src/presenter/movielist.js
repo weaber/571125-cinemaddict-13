@@ -114,7 +114,6 @@ export default class MovieList {
   }
 
   _clearMainContent({resetRenderedFilmsAmount = false, resetSortType = false} = {}) {
-    // const filmsAmount = this._getFilms().length;
     Object
       .values(this._cardPresenter)
       .forEach((presenter) => presenter.destroy());

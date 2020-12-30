@@ -176,7 +176,6 @@ const createNewCommentTemplate = (data) => {
 
 };
 
-
 const createPopupTemplate = (data) => {
   const {
     comments
@@ -281,9 +280,7 @@ export default class Popup extends SmartView {
     if (evt.target.className === `film-details__comment-delete`) {
       // console.log(evt);
       // console.log(this._data.comments);
-
     }
-
   }
 
   setWatchlistClickHandler(callback) {
