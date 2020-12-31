@@ -117,8 +117,7 @@ const EmotionPicsMap = {
   angry: `./images/emoji/angry.png`
 };
 
-const createCommentsTemplate = (data, commentsCollection) => {
-  const {comments} = data;
+const createCommentsTemplate = (thisFilmComments) => {
 
   const createCommentTemplate = (comment) => {
     const {id, author, text, emotion, date} = comment;
@@ -139,7 +138,7 @@ const createCommentsTemplate = (data, commentsCollection) => {
     `;
   };
 
-  return comments.map((item) => createCommentTemplate(commentsCollection[item])).join(` `);
+  return thisFilmComments.map(createCommentTemplate).join(``);
 };
 
 const createNewCommentTemplate = (data) => {
@@ -189,7 +188,7 @@ const createPopupTemplate = (data, commentsCollection, localComment) => {
 
   const filmDetailsInfoTemplate = createFilmDetailsInfoTemplate(data);
   const filmDetailsControlsTemplate = createFilmDetailsControlsTemplate(data);
-  const commentsTemplate = createCommentsTemplate(data, commentsCollection);
+  const commentsTemplate = createCommentsTemplate(commentsCollection);
   const newCommentTemplate = createNewCommentTemplate(localComment);
 
   return `<section class="film-details">
@@ -224,10 +223,11 @@ const createPopupTemplate = (data, commentsCollection, localComment) => {
 };
 
 export default class Popup extends SmartView {
-  constructor(film, commentsCollection) {
+  constructor(film, thisFilmComments) {
     super();
     this._data = film;
-    this._commentsCollection = commentsCollection;
+    this._thisFilmComments = thisFilmComments;
+
     this._localComment = BLANK_COMMENT;
 
     this._closeClickHandler = this._closeClickHandler.bind(this);
@@ -238,12 +238,10 @@ export default class Popup extends SmartView {
 
     this._emojiClickHandler = this._emojiClickHandler.bind(this);
     this._deleteButtonClickHandler = this._deleteButtonClickHandler.bind(this);
-
-    this.restoreHandlers();
   }
 
   getTemplate() {
-    return createPopupTemplate(this._data, this._commentsCollection, this._localComment);
+    return createPopupTemplate(this._data, this._thisFilmComments, this._localComment);
   }
 
   _closeClickHandler(evt) {
@@ -280,6 +278,7 @@ export default class Popup extends SmartView {
           newEmotion: evt.target.value,
         }
     );
+    // console.log(this._localComment);
     this.updateElement();
   }
 
@@ -305,11 +304,7 @@ export default class Popup extends SmartView {
 
   _setInnerHandlers() {
     let emojies = this.getElement().querySelectorAll(`.film-details__emoji-item`);
-    for (let emoji of emojies) {
-      emoji.addEventListener(`click`, this._emojiClickHandler);
-    }
-
-    // let comments = this.getElement().querySelectorAll(`.film-details__comment`);
+    emojies.forEach((emoji) => emoji.addEventListener(`click`, this._emojiClickHandler));
     let commentsDeleteButtons = this.getElement().querySelectorAll(`.film-details__comment-delete`);
     commentsDeleteButtons.forEach((comment) => comment.addEventListener(`click`, this._deleteButtonClickHandler));
   }

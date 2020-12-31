@@ -7,13 +7,7 @@ export default class Comments extends Observer {
   }
 
   setComments(comments) {
-    if (!comments) {
-      return;
-    }
-    this._comments = Object.assign(
-        {},
-        comments
-    );
+    this._comments = comments;
   }
 
   getComments() {
@@ -32,7 +26,9 @@ export default class Comments extends Observer {
     this._notify(updateType, update);
   }
 
-  addComment() {
-
+  // Заготовка
+  addComment(update) {
+    this._comments[update.id] = update;
+    this._notify(update);
   }
 }
