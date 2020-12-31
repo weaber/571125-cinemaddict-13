@@ -3,6 +3,11 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 
+const BLANK_COMMENT = {
+  text: ``,
+  newEmotion: ``
+};
+
 const createFilmDetailsInfoTemplate = (data) => {
   const {
     poster,
@@ -133,7 +138,7 @@ const createCommentsTemplate = (data, commentsCollection) => {
     </li>
     `;
   };
-  // return commentsCollection.map(createCommentTemplate).join(``);
+
   return comments.map((item) => createCommentTemplate(commentsCollection[item])).join(` `);
 };
 
@@ -177,7 +182,7 @@ const createNewCommentTemplate = (data) => {
 
 };
 
-const createPopupTemplate = (data, commentsCollection) => {
+const createPopupTemplate = (data, commentsCollection, localComment) => {
   const {
     comments
   } = data;
@@ -185,7 +190,7 @@ const createPopupTemplate = (data, commentsCollection) => {
   const filmDetailsInfoTemplate = createFilmDetailsInfoTemplate(data);
   const filmDetailsControlsTemplate = createFilmDetailsControlsTemplate(data);
   const commentsTemplate = createCommentsTemplate(data, commentsCollection);
-  const newCommentTemplate = createNewCommentTemplate(data);
+  const newCommentTemplate = createNewCommentTemplate(localComment);
 
   return `<section class="film-details">
     <form class="film-details__inner" action="" method="get">
@@ -223,6 +228,7 @@ export default class Popup extends SmartView {
     super();
     this._data = film;
     this._commentsCollection = commentsCollection;
+    this._localComment = BLANK_COMMENT;
 
     this._closeClickHandler = this._closeClickHandler.bind(this);
 
@@ -237,7 +243,7 @@ export default class Popup extends SmartView {
   }
 
   getTemplate() {
-    return createPopupTemplate(this._data, this._commentsCollection);
+    return createPopupTemplate(this._data, this._commentsCollection, this._localComment);
   }
 
   _closeClickHandler(evt) {
@@ -267,9 +273,9 @@ export default class Popup extends SmartView {
 
   _emojiClickHandler(evt) {
     evt.preventDefault();
-    this._data = Object.assign(
+    this._localComment = Object.assign(
         {},
-        this._data,
+        this._localComment,
         {
           newEmotion: evt.target.value,
         }
