@@ -285,7 +285,17 @@ export default class Popup extends SmartView {
 
   _deleteButtonClickHandler(evt) {
     evt.preventDefault();
-    console.log(evt.target.dataset.commentId);
+    // console.log(evt.target.dataset.commentId);
+
+    const index = this._data.comments.findIndex((comment) => comment === evt.target.dataset.commentId);
+    if (index === -1) {
+      throw new Error(`Can't delete unexisting comment`);
+    }
+    this._data.comments = [
+      ...this._data.comments.slice(0, index),
+      ...this._data.comments.slice(index + 1)
+    ];
+    this.updateElement();
   }
 
   setWatchlistClickHandler(callback) {
