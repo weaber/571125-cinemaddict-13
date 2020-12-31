@@ -121,7 +121,7 @@ const createCommentsTemplate = (data, commentsCollection) => {
   const {comments} = data;
 
   const createCommentTemplate = (comment) => {
-    const {author, text, emotion, date} = comment;
+    const {id, author, text, emotion, date} = comment;
 
     return `<li class="film-details__comment">
       <span class="film-details__comment-emoji">
@@ -132,7 +132,7 @@ const createCommentsTemplate = (data, commentsCollection) => {
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${author}</span>
           <span class="film-details__comment-day">${dayjs(date).fromNow()}</span>
-          <button class="film-details__comment-delete">Delete</button>
+          <button class="film-details__comment-delete" data-comment-id=${id}>Delete</button>
         </p>
       </div>
     </li>
@@ -285,10 +285,7 @@ export default class Popup extends SmartView {
 
   _deleteButtonClickHandler(evt) {
     evt.preventDefault();
-    if (evt.target.className === `film-details__comment-delete`) {
-      // console.log(evt);
-      // console.log(this._data.comments);
-    }
+    console.log(evt.target.dataset.commentId);
   }
 
   setWatchlistClickHandler(callback) {
@@ -312,9 +309,9 @@ export default class Popup extends SmartView {
       emoji.addEventListener(`click`, this._emojiClickHandler);
     }
 
-    let comments = this.getElement().querySelectorAll(`.film-details__comment`);
-    // let commentsDeleteButtons = this.getElement().querySelectorAll(`.film-details__comment-delete`);
-    comments.forEach((comment) => comment.addEventListener(`click`, this._deleteButtonClickHandler));
+    // let comments = this.getElement().querySelectorAll(`.film-details__comment`);
+    let commentsDeleteButtons = this.getElement().querySelectorAll(`.film-details__comment-delete`);
+    commentsDeleteButtons.forEach((comment) => comment.addEventListener(`click`, this._deleteButtonClickHandler));
   }
 
   restoreHandlers() {

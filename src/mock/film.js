@@ -111,7 +111,7 @@ const generateComment = () => {
   const generateText = () => FILM_DESCRIPTION[getRandomInt(FILM_DESCRIPTION.length - 1)];
   const generateEmotion = () => EMOTIONS[getRandomInt(EMOTIONS.length - 1)];
   return {
-    idMessage: generateId(),
+    id: generateId(),
     text: generateText(),
     emotion: generateEmotion(),
     date: generateDate(30, `days`),
@@ -123,7 +123,7 @@ const generateComments = (amount) => {
   let comments = {};
   for (let i = 0; i < amount; i++) {
     let comment = generateComment();
-    comments[comment.idMessage] = comment;
+    comments[comment.id] = comment;
   }
   return comments;
 };
