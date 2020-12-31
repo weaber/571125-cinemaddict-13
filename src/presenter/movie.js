@@ -76,10 +76,7 @@ export default class Movie {
   _showPopup() {
     this._commentsModel = new CommentsModel();
     this._commentsModel.setComments(commentsCollection);
-    const Allcomments = this._commentsModel.getComments();
-    const thisFilmComments = this._film.comments.map((item) => (Allcomments[item]));
-
-    this._popupComponent = new PopupView(this._film, thisFilmComments);
+    this._popupComponent = new PopupView(this._film, this._commentsModel.getComments());
 
     this._changeMode();
     this._mode = Mode.POPUP;
@@ -150,4 +147,6 @@ export default class Movie {
         )
     );
   }
+
+
 }
