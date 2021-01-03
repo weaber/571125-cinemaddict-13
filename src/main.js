@@ -1,9 +1,9 @@
 import FilmsModel from "./model/movies.js";
 import FiltersModel from "./model/filters.js";
 
-import UserProfileView from "./view/user-profile.js";
 import FooterStatsView from "./view/footer-statistics.js";
 
+import UserProfilePresenter from "./presenter/user-profile.js";
 import MovieListPresenter from "./presenter/movielist.js";
 import FiltersPresenter from "./presenter/filters.js";
 
@@ -19,19 +19,20 @@ filmsModel.setFilms(films);
 
 const filtersModel = new FiltersModel();
 
-const watchedFilmsAmount = getRandomInt(0, films.length);
-
 const siteHeaderElement = document.querySelector(`.header`);
-if (films.length > 0 && watchedFilmsAmount > 0) {
-  render(siteHeaderElement, new UserProfileView(watchedFilmsAmount), RenderPosition.BEFOREEND);
-}
+// if (films.length > 0 && watchedFilmsAmount > 0) {
+//   render(siteHeaderElement, new UserProfileView(watchedFilmsAmount), RenderPosition.BEFOREEND);
+// }
 
 const siteMainElement = document.querySelector(`.main`);
+
+const userProfilePresenter = new UserProfilePresenter(siteHeaderElement, filmsModel);
 
 const filtersPresenter = new FiltersPresenter(siteMainElement, filtersModel, filmsModel);
 
 const movieListPresenter = new MovieListPresenter(siteMainElement, filmsModel, filtersModel);
 
+userProfilePresenter.init();
 filtersPresenter.init();
 movieListPresenter.init();
 
