@@ -142,13 +142,13 @@ const createCommentsTemplate = (data, commentsCollection) => {
   return comments.map((item) => createCommentTemplate(commentsCollection[item])).join(` `);
 };
 
-const createNewCommentTemplate = (data) => {
+const createNewCommentTemplate = (localComment) => {
   const {
     // author = ``,
     // date = ``,
     // text = ``,
     newEmotion
-  } = data;
+  } = localComment;
 
   const newEmojiPicture = (newEmotion) ? `<img src=${EmotionPicsMap[newEmotion]} width="55" height="55" alt="emoji-${newEmotion}">` : ``;
 
@@ -279,8 +279,10 @@ export default class Popup extends SmartView {
           newEmotion: evt.target.value,
         }
     );
-    // console.log(this._localComment);
-    this.updateElement();
+
+    let currentScrollYPosition = this.getElement().scrollTop;
+    this.updateData(this._localComment.newEmotion);
+    this.getElement().scrollTo(0, currentScrollYPosition);
   }
 
   _deleteButtonClickHandler(evt) {
@@ -316,8 +318,8 @@ export default class Popup extends SmartView {
   _setInnerHandlers() {
     let emojies = this.getElement().querySelectorAll(`.film-details__emoji-item`);
     emojies.forEach((emoji) => emoji.addEventListener(`click`, this._emojiClickHandler));
-    let commentsDeleteButtons = this.getElement().querySelectorAll(`.film-details__comment-delete`);
-    commentsDeleteButtons.forEach((comment) => comment.addEventListener(`click`, this._deleteButtonClickHandler));
+    // let commentsDeleteButtons = this.getElement().querySelectorAll(`.film-details__comment-delete`);
+    // commentsDeleteButtons.forEach((comment) => comment.addEventListener(`click`, this._deleteButtonClickHandler));
   }
 
   restoreHandlers() {

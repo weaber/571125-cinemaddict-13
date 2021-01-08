@@ -1,7 +1,5 @@
 import UserProfileView from "../view/user-profile.js";
 import {render, RenderPosition, remove, replace} from "../utils/render.js";
-import {FilterType} from "../const.js";
-import {filter} from "../utils/utils.js";
 
 const UserTitleMap = {
   NOVICE: `Novice`,
@@ -25,7 +23,6 @@ export default class UserProfile {
     this._userTitle = this._getUserTitle();
 
     const prevUserProfileComponent = this._userProfileComponent;
-
     this._userProfileComponent = new UserProfileView(this._userTitle);
 
     if (prevUserProfileComponent === null) {

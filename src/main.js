@@ -20,16 +20,10 @@ filmsModel.setFilms(films);
 const filtersModel = new FiltersModel();
 
 const siteHeaderElement = document.querySelector(`.header`);
-// if (films.length > 0 && watchedFilmsAmount > 0) {
-//   render(siteHeaderElement, new UserProfileView(watchedFilmsAmount), RenderPosition.BEFOREEND);
-// }
-
 const siteMainElement = document.querySelector(`.main`);
 
 const userProfilePresenter = new UserProfilePresenter(siteHeaderElement, filmsModel);
-
 const filtersPresenter = new FiltersPresenter(siteMainElement, filtersModel, filmsModel);
-
 const movieListPresenter = new MovieListPresenter(siteMainElement, filmsModel, filtersModel);
 
 userProfilePresenter.init();
