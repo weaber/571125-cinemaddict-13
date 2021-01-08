@@ -29,6 +29,10 @@ export default class Movie {
     this._handleWatchlistClick = this._handleWatchlistClick.bind(this);
     this._handleWatchedClick = this._handleWatchedClick.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
+
+    this._handleDeleteButtonClick = this._handleDeleteButtonClick.bind(this);
+
+    // this._handleModelEvent = this._handleModelEvent.bind(this);
   }
 
   init(film) {
@@ -38,6 +42,7 @@ export default class Movie {
     const prevPopupComponent = this._popupComponent;
 
     this._cardComponent = new FilmCardView(this._film);
+    this._commentsModel = new CommentsModel();
 
     this._cardComponent.setPosterClickHandler(this._showPopup);
     this._cardComponent.setTitleClickHandler(this._showPopup);
@@ -74,7 +79,7 @@ export default class Movie {
   }
 
   _showPopup() {
-    this._commentsModel = new CommentsModel();
+
     this._commentsModel.setComments(commentsCollection);
     this._popupComponent = new PopupView(this._film, this._commentsModel.getComments());
 
@@ -85,6 +90,8 @@ export default class Movie {
     this._popupComponent.setWatchlistClickHandler(this._handleWatchlistClick);
     this._popupComponent.setWatchedClickHandler(this._handleWatchedClick);
     this._popupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+
+    this._popupComponent.setDeleteButtonClickHandler(this._handleDeleteButtonClick);
 
     this._popupComponent.restoreHandlers();
 
@@ -104,6 +111,10 @@ export default class Movie {
       this._closePopup();
       document.removeEventListener(`keydown`, this._popupEscPressHandler);
     }
+  }
+
+  _handleDeleteButtonClick(commentId) {
+
   }
 
   _handleWatchlistClick() {
@@ -147,6 +158,5 @@ export default class Movie {
         )
     );
   }
-
 
 }

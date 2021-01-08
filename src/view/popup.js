@@ -237,7 +237,8 @@ export default class Popup extends SmartView {
 
     this._emojiClickHandler = this._emojiClickHandler.bind(this);
     this._newCommentTextInputHandler = this._newCommentTextInputHandler.bind(this);
-    // this._deleteButtonClickHandler = this._deleteButtonClickHandler.bind(this);
+
+    this._deleteButtonClickHandler = this._deleteButtonClickHandler.bind(this);
   }
 
   getTemplate() {
@@ -254,6 +255,11 @@ export default class Popup extends SmartView {
     this.getElement().querySelector(`.film-details__close-btn`).addEventListener(`click`, this._closeClickHandler);
   }
 
+  _deleteButtonClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.deleteButtonClick(evt.target.dataset.commentId);
+  }
+
   _watchlistClickHandler(evt) {
     evt.preventDefault();
     this._callback.watchlistClick();
@@ -267,6 +273,27 @@ export default class Popup extends SmartView {
   _favoriteClickHandler(evt) {
     evt.preventDefault();
     this._callback.favoriteClick();
+  }
+
+  setDeleteButtonClickHandler(callback) {
+    this._callback.deleteButtonClick = callback;
+    let commentsDeleteButtons = this.getElement().querySelectorAll(`.film-details__comment-delete`);
+    commentsDeleteButtons.forEach((comment) => comment.addEventListener(`click`, this._deleteButtonClickHandler));
+  }
+
+  setWatchlistClickHandler(callback) {
+    this._callback.watchlistClick = callback;
+    this.getElement().querySelector(`.film-details__control-label--watchlist`).addEventListener(`click`, this._watchlistClickHandler);
+  }
+
+  setWatchedClickHandler(callback) {
+    this._callback.watchedClick = callback;
+    this.getElement().querySelector(`.film-details__control-label--watched`).addEventListener(`click`, this._watchedClickHandler);
+  }
+
+  setFavoriteClickHandler(callback) {
+    this._callback.favoriteClick = callback;
+    this.getElement().querySelector(`.film-details__control-label--favorite`).addEventListener(`click`, this._favoriteClickHandler);
   }
 
   _emojiClickHandler(evt) {
@@ -295,42 +322,10 @@ export default class Popup extends SmartView {
     );
   }
 
-  _deleteButtonClickHandler(evt) {
-    evt.preventDefault();
-    // console.log(evt.target.dataset.commentId);
-
-    const index = this._data.comments.findIndex((comment) => comment === evt.target.dataset.commentId);
-    if (index === -1) {
-      throw new Error(`Can't delete unexisting comment`);
-    }
-    this._data.comments = [
-      ...this._data.comments.slice(0, index),
-      ...this._data.comments.slice(index + 1)
-    ];
-    this.updateElement();
-  }
-
-  setWatchlistClickHandler(callback) {
-    this._callback.watchlistClick = callback;
-    this.getElement().querySelector(`.film-details__control-label--watchlist`).addEventListener(`click`, this._watchlistClickHandler);
-  }
-
-  setWatchedClickHandler(callback) {
-    this._callback.watchedClick = callback;
-    this.getElement().querySelector(`.film-details__control-label--watched`).addEventListener(`click`, this._watchedClickHandler);
-  }
-
-  setFavoriteClickHandler(callback) {
-    this._callback.favoriteClick = callback;
-    this.getElement().querySelector(`.film-details__control-label--favorite`).addEventListener(`click`, this._favoriteClickHandler);
-  }
-
   _setInnerHandlers() {
     let emojies = this.getElement().querySelectorAll(`.film-details__emoji-item`);
     emojies.forEach((emoji) => emoji.addEventListener(`click`, this._emojiClickHandler));
     this.getElement().querySelector(`.film-details__comment-input`).addEventListener(`input`, this._newCommentTextInputHandler);
-    // let commentsDeleteButtons = this.getElement().querySelectorAll(`.film-details__comment-delete`);
-    // commentsDeleteButtons.forEach((comment) => comment.addEventListener(`click`, this._deleteButtonClickHandler));
   }
 
   restoreHandlers() {
@@ -339,5 +334,7 @@ export default class Popup extends SmartView {
     this.setWatchlistClickHandler(this._callback.watchlistClick);
     this.setWatchedClickHandler(this._callback.watchedClick);
     this.setFavoriteClickHandler(this._callback.favoriteClick);
+
+    this.setDeleteButtonClickHandler(this._callback.deleteButtonClick);
   }
 }
