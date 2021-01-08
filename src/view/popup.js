@@ -144,9 +144,7 @@ const createCommentsTemplate = (data, commentsCollection) => {
 
 const createNewCommentTemplate = (localComment) => {
   const {
-    // author = ``,
-    // date = ``,
-    // text = ``,
+    text,
     newEmotion
   } = localComment;
 
@@ -155,7 +153,7 @@ const createNewCommentTemplate = (localComment) => {
   return `<div class="film-details__add-emoji-label">${newEmojiPicture}</div>
 
   <label class="film-details__comment-label">
-    <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+    <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${text}</textarea>
   </label>
 
   <div class="film-details__emoji-list">
@@ -238,7 +236,8 @@ export default class Popup extends SmartView {
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
 
     this._emojiClickHandler = this._emojiClickHandler.bind(this);
-    this._deleteButtonClickHandler = this._deleteButtonClickHandler.bind(this);
+    this._newCommentTextInputHandler = this._newCommentTextInputHandler.bind(this);
+    // this._deleteButtonClickHandler = this._deleteButtonClickHandler.bind(this);
   }
 
   getTemplate() {
@@ -279,10 +278,21 @@ export default class Popup extends SmartView {
           newEmotion: evt.target.value,
         }
     );
-
     let currentScrollYPosition = this.getElement().scrollTop;
-    this.updateData(this._localComment.newEmotion);
+
+    this.updateData(this._localComment);
     this.getElement().scrollTo(0, currentScrollYPosition);
+  }
+
+  _newCommentTextInputHandler(evt) {
+    evt.preventDefault();
+    this._localComment = Object.assign(
+        {},
+        this._localComment,
+        {
+          text: evt.target.value,
+        }
+    );
   }
 
   _deleteButtonClickHandler(evt) {
@@ -318,6 +328,7 @@ export default class Popup extends SmartView {
   _setInnerHandlers() {
     let emojies = this.getElement().querySelectorAll(`.film-details__emoji-item`);
     emojies.forEach((emoji) => emoji.addEventListener(`click`, this._emojiClickHandler));
+    this.getElement().querySelector(`.film-details__comment-input`).addEventListener(`input`, this._newCommentTextInputHandler);
     // let commentsDeleteButtons = this.getElement().querySelectorAll(`.film-details__comment-delete`);
     // commentsDeleteButtons.forEach((comment) => comment.addEventListener(`click`, this._deleteButtonClickHandler));
   }
