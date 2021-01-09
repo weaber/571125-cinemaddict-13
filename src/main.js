@@ -8,6 +8,7 @@ import MovieListPresenter from "./presenter/movielist.js";
 import FiltersPresenter from "./presenter/filters.js";
 
 import {generateFilm} from "./mock/film.js";
+// import {comments} from "./mock/comments.js";
 import {getRandomInt} from "./utils/utils.js";
 import {render, RenderPosition} from "./utils/render.js";
 

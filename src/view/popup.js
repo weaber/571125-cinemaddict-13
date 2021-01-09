@@ -117,13 +117,10 @@ const EmotionPicsMap = {
   angry: `./images/emoji/angry.png`
 };
 
-const createCommentsTemplate = (data, commentsCollection) => {
-  const {comments} = data;
+const createCommentTemplate = (comment) => {
+  const {id, emotion, author, date, text} = comment;
 
-  const createCommentTemplate = (comment) => {
-    const {id, author, text, emotion, date} = comment;
-
-    return `<li class="film-details__comment">
+  return `<li class="film-details__comment">
       <span class="film-details__comment-emoji">
         <img src=${EmotionPicsMap[emotion]} width="55" height="55" alt="emoji-${emotion}">
       </span>
@@ -132,14 +129,20 @@ const createCommentsTemplate = (data, commentsCollection) => {
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${author}</span>
           <span class="film-details__comment-day">${dayjs(date).fromNow()}</span>
-          <button class="film-details__comment-delete" data-comment-id=${id}>Delete</button>
+          <button class="film-details__comment-delete" data-comment-id="${id}">Delete</button>
         </p>
       </div>
-    </li>
-    `;
-  };
+    </li>`;
+};
 
-  return comments.map((item) => createCommentTemplate(commentsCollection[item])).join(` `);
+const createCommentsTemplate = (comments) => {
+  const commentListTemplate = comments
+    .slice()
+    .sort((a, b) => dayjs(a.date).diff(dayjs(b.date)))
+    .map(createCommentTemplate)
+    .join(`\n`);
+
+  return commentListTemplate;
 };
 
 const createNewCommentTemplate = (localComment) => {
@@ -187,7 +190,7 @@ const createPopupTemplate = (data, commentsCollection, localComment) => {
 
   const filmDetailsInfoTemplate = createFilmDetailsInfoTemplate(data);
   const filmDetailsControlsTemplate = createFilmDetailsControlsTemplate(data);
-  const commentsTemplate = createCommentsTemplate(data, commentsCollection);
+  const commentsTemplate = createCommentsTemplate(commentsCollection);
   const newCommentTemplate = createNewCommentTemplate(localComment);
 
   return `<section class="film-details">
@@ -257,6 +260,7 @@ export default class Popup extends SmartView {
 
   _deleteButtonClickHandler(evt) {
     evt.preventDefault();
+    console.log(evt.target.dataset.commentId);
     this._callback.deleteButtonClick(evt.target.dataset.commentId);
   }
 
