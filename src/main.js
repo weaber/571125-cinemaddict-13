@@ -1,6 +1,7 @@
 import FilmsModel from "./model/movies.js";
 import FiltersModel from "./model/filters.js";
 
+import MenuView from "./view/menu.js";
 import FooterStatsView from "./view/footer-statistics.js";
 
 import UserProfilePresenter from "./presenter/user-profile.js";
@@ -8,7 +9,6 @@ import MovieListPresenter from "./presenter/movielist.js";
 import FiltersPresenter from "./presenter/filters.js";
 
 import {generateFilm} from "./mock/film.js";
-// import {comments} from "./mock/comments.js";
 import {getRandomInt} from "./utils/utils.js";
 import {render, RenderPosition} from "./utils/render.js";
 
@@ -23,8 +23,13 @@ const filtersModel = new FiltersModel();
 const siteHeaderElement = document.querySelector(`.header`);
 const siteMainElement = document.querySelector(`.main`);
 
+const menuComponent = new MenuView();
+render(siteMainElement, menuComponent, RenderPosition.BEFOREEND);
+
+const siteNavigationElement = siteMainElement.querySelector(`.main-navigation`);
+
 const userProfilePresenter = new UserProfilePresenter(siteHeaderElement, filmsModel);
-const filtersPresenter = new FiltersPresenter(siteMainElement, filtersModel, filmsModel);
+const filtersPresenter = new FiltersPresenter(siteNavigationElement, filtersModel, filmsModel);
 const movieListPresenter = new MovieListPresenter(siteMainElement, filmsModel, filtersModel);
 
 userProfilePresenter.init();
