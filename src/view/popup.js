@@ -136,6 +136,7 @@ const createCommentTemplate = (comment) => {
 };
 
 const createCommentsTemplate = (comments) => {
+  // debugger;
   const commentListTemplate = comments
     .slice()
     .sort((a, b) => dayjs(a.date).diff(dayjs(b.date)))
@@ -260,7 +261,7 @@ export default class Popup extends SmartView {
 
   _deleteButtonClickHandler(evt) {
     evt.preventDefault();
-    console.log(evt.target.dataset.commentId);
+    // console.log(evt.target.dataset.commentId);
     this._callback.deleteButtonClick(evt.target.dataset.commentId);
   }
 

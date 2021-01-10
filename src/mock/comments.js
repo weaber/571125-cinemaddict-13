@@ -54,5 +54,5 @@ export const generateComment = (filmId) => {
 
 export const deleteComment = (filmId, commentId) => {
   comments[filmId] = comments[filmId]
-    .filter((currentComment) => currentComment.id !== commentId);
+    .filter((currentComment) => currentComment.id !== +commentId);
 };

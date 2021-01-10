@@ -40,14 +40,18 @@ export default class Movie {
   }
 
   init(film) {
+    // debugger;
     this._film = film;
 
     const prevCardComponent = this._cardComponent;
     const prevPopupComponent = this._popupComponent;
 
     this._cardComponent = new FilmCardView(this._film);
-
     this._commentsModel.setComments(getComments(this._film.id));
+
+    console.log(this._film);
+    console.log(this._commentsModel.getComments());
+
     this._popupComponent = new PopupView(this._film, this._commentsModel.getComments());
 
     this._popupComponent.setCloseClickHandler(this._closePopup);
@@ -64,22 +68,6 @@ export default class Movie {
     this._cardComponent.setWatchlistClickHandler(this._handleWatchlistClick);
     this._cardComponent.setWatchedClickHandler(this._handleWatchedClick);
     this._cardComponent.setFavoriteClickHandler(this._handleFavoriteClick);
-
-    // if (prevCardComponent === null) {
-    //   render(this._movieListContainer, this._cardComponent, RenderPosition.BEFOREEND);
-    //   return;
-    // }
-
-    // if (this._movieListContainer.getElement().contains(prevCardComponent.getElement())) {
-    //   replace(this._cardComponent, prevCardComponent);
-    // }
-
-    // if (prevPopupComponent) {
-    //   if (this._bodyElement.contains(prevPopupComponent.getElement())) {
-    //     remove(prevPopupComponent);
-    //     this._showPopup();
-    //   }
-    // }
 
     if (prevCardComponent === null || prevPopupComponent === null) {
       render(this._movieListContainer, this._cardComponent, RenderPosition.BEFOREEND);
@@ -110,18 +98,8 @@ export default class Movie {
   }
 
   _showPopup() {
-    // this._commentsModel.setComments(getComments(this._film.id));
-    // this._popupComponent = new PopupView(this._film, this._commentsModel.getComments());
-
     this._changeMode();
     this._mode = Mode.POPUP;
-
-    // this._popupComponent.setCloseClickHandler(this._closePopup);
-    // this._popupComponent.setWatchlistClickHandler(this._handleWatchlistClick);
-    // this._popupComponent.setWatchedClickHandler(this._handleWatchedClick);
-    // this._popupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
-    // this._popupComponent.setDeleteButtonClickHandler(this._handleDeleteButtonClick);
-    // this._popupComponent.restoreHandlers();
 
     render(this._bodyElement, this._popupComponent, RenderPosition.BEFOREEND);
     document.addEventListener(`keydown`, this._popupEscPressHandler);
@@ -143,8 +121,8 @@ export default class Movie {
 
   _handleDeleteButtonClick(commentId) {
     // console.log(commentId);
-    this._commentsModel.delete(UserAction.DELETE_COMMENT, commentId);
     deleteComment(this._film.id, commentId);
+    this._commentsModel.delete(UserAction.DELETE_COMMENT, commentId);
   }
 
   _handleWatchlistClick() {
@@ -199,7 +177,7 @@ export default class Movie {
                 {},
                 this._film,
                 {
-                  comments: this._commentsModel.getComments().slice()
+                  comments: this._commentsModel.getComments().map((item) => item.id)
                 }
             )
         );
