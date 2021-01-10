@@ -24,7 +24,7 @@ const EMOTIONS = [
 
 export const comments = {};
 
-const addComment = (filmId, comment) => {
+export const addComment = (filmId, comment) => {
   if (!comments[filmId]) {
     comments[filmId] = [];
   }

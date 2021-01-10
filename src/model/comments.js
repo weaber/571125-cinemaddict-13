@@ -14,7 +14,7 @@ export default class Comments extends Observer {
     return this._comments;
   }
 
-  delete(updateType, commentId) {
+  deleteComment(updateType, commentId) {
     const index = this._comments.findIndex((comment) => comment.id === +commentId);
 
     if (index === -1) {
@@ -28,8 +28,12 @@ export default class Comments extends Observer {
     this._notify(updateType);
   }
 
-  addComment(update) {
-    this._comments[update.id] = update;
-    this._notify(update);
+  addComment(updateType, update) {
+    this._comments = [
+      ...this._comments,
+      update
+    ];
+
+    this._notify(updateType);
   }
 }

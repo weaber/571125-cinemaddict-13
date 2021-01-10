@@ -136,13 +136,11 @@ const createCommentTemplate = (comment) => {
 };
 
 const createCommentsTemplate = (comments) => {
-  // debugger;
   const commentListTemplate = comments
     .slice()
     .sort((a, b) => dayjs(a.date).diff(dayjs(b.date)))
     .map(createCommentTemplate)
     .join(`\n`);
-
   return commentListTemplate;
 };
 
@@ -261,7 +259,6 @@ export default class Popup extends SmartView {
 
   _deleteButtonClickHandler(evt) {
     evt.preventDefault();
-    // console.log(evt.target.dataset.commentId);
     this._callback.deleteButtonClick(evt.target.dataset.commentId);
   }
 
@@ -325,6 +322,10 @@ export default class Popup extends SmartView {
           text: evt.target.value,
         }
     );
+  }
+
+  getNewComment() {
+    return this._localComment;
   }
 
   _setInnerHandlers() {

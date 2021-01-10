@@ -3,7 +3,7 @@ import PopupView from "../view/popup.js";
 import {remove, render, RenderPosition, replace} from "../utils/render.js";
 import {UserAction, UpdateType} from "../const.js";
 import CommentsModel from "../model/comments.js";
-import {getComments, deleteComment, comments} from "../mock/comments.js";
+import {getComments, deleteComment, addComment} from "../mock/comments.js";
 
 const Mode = {
   DEFAULT: `DEFAULT`,
@@ -37,10 +37,11 @@ export default class Movie {
 
     this._commentsModel = new CommentsModel();
     this._commentsModel.addObserver(this._handleModelEvent);
+
+    this._handleFormSubmit = this._handleFormSubmit.bind(this);
   }
 
   init(film) {
-    // debugger;
     this._film = film;
 
     const prevCardComponent = this._cardComponent;
@@ -48,9 +49,6 @@ export default class Movie {
 
     this._cardComponent = new FilmCardView(this._film);
     this._commentsModel.setComments(getComments(this._film.id));
-
-    console.log(this._film);
-    console.log(this._commentsModel.getComments());
 
     this._popupComponent = new PopupView(this._film, this._commentsModel.getComments());
 
@@ -102,6 +100,7 @@ export default class Movie {
     this._mode = Mode.POPUP;
 
     render(this._bodyElement, this._popupComponent, RenderPosition.BEFOREEND);
+    document.addEventListener(`keydown`, this._handleFormSubmit);
     document.addEventListener(`keydown`, this._popupEscPressHandler);
   }
 
@@ -109,6 +108,7 @@ export default class Movie {
     this._mode = Mode.DEFAULT;
     remove(this._popupComponent);
     document.removeEventListener(`keydown`, this._popupEscPressHandler);
+    document.removeEventListener(`keydown`, this._handleFormSubmit);
   }
 
   _popupEscPressHandler(evt) {
@@ -116,13 +116,35 @@ export default class Movie {
       evt.preventDefault();
       this._closePopup();
       document.removeEventListener(`keydown`, this._popupEscPressHandler);
+      document.removeEventListener(`keydown`, this._handleFormSubmit);
     }
   }
 
   _handleDeleteButtonClick(commentId) {
-    // console.log(commentId);
     deleteComment(this._film.id, commentId);
-    this._commentsModel.delete(UserAction.DELETE_COMMENT, commentId);
+    this._commentsModel.deleteComment(UserAction.DELETE_COMMENT, commentId);
+  }
+
+  _handleFormSubmit(evt) {
+    if (evt.ctrlKey && evt.key === `Enter`) {
+      const localComment = this._popupComponent.getNewComment();
+
+      if (localComment.newEmotion === `` || localComment.text === ``) {
+        return;
+      }
+
+      localComment.date = new Date();
+      localComment.author = `Random Man`;
+      localComment.emotion = localComment.newEmotion;
+      localComment.id = Date.now() + parseInt(Math.random() * 10000, 10);
+
+      addComment(this._film.id, localComment);
+
+      this._commentsModel.addComment(
+          UserAction.ADD_COMMENT,
+          localComment
+      );
+    }
   }
 
   _handleWatchlistClick() {
@@ -169,7 +191,7 @@ export default class Movie {
 
   _handleModelEvent(userAction) {
     switch (userAction) {
-      case UserAction.DELETE_COMMENT: {
+      case UserAction.DELETE_COMMENT:
         this._changeData(
             UserAction.UPDATE_FILM,
             UpdateType.PATCH,
@@ -182,7 +204,20 @@ export default class Movie {
             )
         );
         break;
-      }
+
+      case UserAction.ADD_COMMENT:
+        this._changeData(
+            UserAction.UPDATE_FILM,
+            UpdateType.PATCH,
+            Object.assign(
+                {},
+                this._film,
+                {
+                  comments: this._commentsModel.getComments().map((item) => item.id)
+                }
+            )
+        );
+        break;
     }
   }
 
