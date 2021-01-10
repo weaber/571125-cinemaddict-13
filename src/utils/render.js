@@ -46,6 +46,10 @@ export const createElement = (template) => {
 };
 
 export const remove = (component) => {
+  if (component === null) {
+    return;
+  }
+
   if (!(component instanceof Abstract)) {
     throw new Error(`Cant remove only components`);
   }

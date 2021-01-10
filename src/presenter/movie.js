@@ -1,11 +1,16 @@
 import FilmCardView from "../view/film-card.js";
 import PopupView from "../view/popup.js";
 import {remove, render, RenderPosition, replace} from "../utils/render.js";
+import {UserAction, UpdateType} from "../const.js";
+import CommentsModel from "../model/comments.js";
+import {getComments, deleteComment, addComment} from "../mock/comments.js";
 
 const Mode = {
   DEFAULT: `DEFAULT`,
   POPUP: `POPUP`
 };
+
+const page = document.querySelector(`body`);
 
 export default class Movie {
   constructor(movieListContainer, changeData, changeMode) {
@@ -26,6 +31,14 @@ export default class Movie {
     this._handleWatchlistClick = this._handleWatchlistClick.bind(this);
     this._handleWatchedClick = this._handleWatchedClick.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
+
+    this._handleDeleteButtonClick = this._handleDeleteButtonClick.bind(this);
+    this._handleModelEvent = this._handleModelEvent.bind(this);
+
+    this._commentsModel = new CommentsModel();
+    this._commentsModel.addObserver(this._handleModelEvent);
+
+    this._handleFormSubmit = this._handleFormSubmit.bind(this);
   }
 
   init(film) {
@@ -35,6 +48,17 @@ export default class Movie {
     const prevPopupComponent = this._popupComponent;
 
     this._cardComponent = new FilmCardView(this._film);
+    this._commentsModel.setComments(getComments(this._film.id));
+
+    this._popupComponent = new PopupView(this._film, this._commentsModel.getComments());
+
+    this._popupComponent.setCloseClickHandler(this._closePopup);
+    this._popupComponent.setWatchlistClickHandler(this._handleWatchlistClick);
+    this._popupComponent.setWatchedClickHandler(this._handleWatchedClick);
+    this._popupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+    this._popupComponent.setDeleteButtonClickHandler(this._handleDeleteButtonClick);
+    this._popupComponent.restoreHandlers();
+
 
     this._cardComponent.setPosterClickHandler(this._showPopup);
     this._cardComponent.setTitleClickHandler(this._showPopup);
@@ -43,9 +67,7 @@ export default class Movie {
     this._cardComponent.setWatchedClickHandler(this._handleWatchedClick);
     this._cardComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
-    // this._popupComponent = new PopupView(this._film);
-
-    if (prevCardComponent === null) {
+    if (prevCardComponent === null || prevPopupComponent === null) {
       render(this._movieListContainer, this._cardComponent, RenderPosition.BEFOREEND);
       return;
     }
@@ -54,16 +76,18 @@ export default class Movie {
       replace(this._cardComponent, prevCardComponent);
     }
 
-    if (this._bodyElement.contains(prevPopupComponent.getElement())) {
-      remove(prevPopupComponent);
-      this._showPopup();
+    if (page.contains(prevPopupComponent.getElement())) {
+      replace(this._popupComponent, prevPopupComponent);
     }
+
+    remove(prevPopupComponent);
+    remove(prevCardComponent);
   }
 
-  // destroy() {
-  //   remove(this._cardComponent);
-  //   remove(this._popupComponent);
-  // }
+  destroy() {
+    remove(this._cardComponent);
+    remove(this._popupComponent);
+  }
 
   resetView() {
     if (this._mode !== Mode.DEFAULT) {
@@ -72,18 +96,11 @@ export default class Movie {
   }
 
   _showPopup() {
-    this._popupComponent = new PopupView(this._film);
     this._changeMode();
     this._mode = Mode.POPUP;
 
-    this._popupComponent.setCloseClickHandler(this._closePopup);
-    this._popupComponent.setWatchlistClickHandler(this._handleWatchlistClick);
-    this._popupComponent.setWatchedClickHandler(this._handleWatchedClick);
-    this._popupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
-
-    this._popupComponent.restoreHandlers();
-
     render(this._bodyElement, this._popupComponent, RenderPosition.BEFOREEND);
+    document.addEventListener(`keydown`, this._handleFormSubmit);
     document.addEventListener(`keydown`, this._popupEscPressHandler);
   }
 
@@ -91,6 +108,7 @@ export default class Movie {
     this._mode = Mode.DEFAULT;
     remove(this._popupComponent);
     document.removeEventListener(`keydown`, this._popupEscPressHandler);
+    document.removeEventListener(`keydown`, this._handleFormSubmit);
   }
 
   _popupEscPressHandler(evt) {
@@ -98,11 +116,41 @@ export default class Movie {
       evt.preventDefault();
       this._closePopup();
       document.removeEventListener(`keydown`, this._popupEscPressHandler);
+      document.removeEventListener(`keydown`, this._handleFormSubmit);
+    }
+  }
+
+  _handleDeleteButtonClick(commentId) {
+    deleteComment(this._film.id, commentId);
+    this._commentsModel.deleteComment(UserAction.DELETE_COMMENT, commentId);
+  }
+
+  _handleFormSubmit(evt) {
+    if (evt.ctrlKey && evt.key === `Enter`) {
+      const localComment = this._popupComponent.getNewComment();
+
+      if (localComment.newEmotion === `` || localComment.text === ``) {
+        return;
+      }
+
+      localComment.date = new Date();
+      localComment.author = `Random Man`;
+      localComment.emotion = localComment.newEmotion;
+      localComment.id = Date.now() + parseInt(Math.random() * 10000, 10);
+
+      addComment(this._film.id, localComment);
+
+      this._commentsModel.addComment(
+          UserAction.ADD_COMMENT,
+          localComment
+      );
     }
   }
 
   _handleWatchlistClick() {
     this._changeData(
+        UserAction.UPDATE_FILM,
+        UpdateType.PATCH,
         Object.assign(
             {},
             this._film,
@@ -115,6 +163,8 @@ export default class Movie {
 
   _handleWatchedClick() {
     this._changeData(
+        UserAction.UPDATE_FILM,
+        UpdateType.PATCH,
         Object.assign(
             {},
             this._film,
@@ -127,6 +177,8 @@ export default class Movie {
 
   _handleFavoriteClick() {
     this._changeData(
+        UserAction.UPDATE_FILM,
+        UpdateType.PATCH,
         Object.assign(
             {},
             this._film,
@@ -136,4 +188,37 @@ export default class Movie {
         )
     );
   }
+
+  _handleModelEvent(userAction) {
+    switch (userAction) {
+      case UserAction.DELETE_COMMENT:
+        this._changeData(
+            UserAction.UPDATE_FILM,
+            UpdateType.PATCH,
+            Object.assign(
+                {},
+                this._film,
+                {
+                  comments: this._commentsModel.getComments().map((item) => item.id)
+                }
+            )
+        );
+        break;
+
+      case UserAction.ADD_COMMENT:
+        this._changeData(
+            UserAction.UPDATE_FILM,
+            UpdateType.PATCH,
+            Object.assign(
+                {},
+                this._film,
+                {
+                  comments: this._commentsModel.getComments().map((item) => item.id)
+                }
+            )
+        );
+        break;
+    }
+  }
+
 }
