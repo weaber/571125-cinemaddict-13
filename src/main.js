@@ -55,8 +55,9 @@ movieListPresenter.init();
 
 const statsComponent = new StatsView();
 render(siteMainElement, statsComponent, RenderPosition.BEFOREEND);
-console.log(statsComponent);
-statsComponent.hide();
+
+statsComponent.show();
+movieListPresenter.hide();
 
 const footerStatisitcsElement = document.querySelector(`.footer__statistics`);
 render(footerStatisitcsElement, new FooterStatsView(films), RenderPosition.BEFOREEND);

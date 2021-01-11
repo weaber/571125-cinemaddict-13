@@ -69,6 +69,14 @@ export default class MovieList {
     this._renderMainContent();
   }
 
+  hide() {
+    this._filmsListComponent.getElement().classList.add(`visually-hidden`);
+  }
+
+  show() {
+    this._filmsListComponent.getElement().classList.remove(`visually-hidden`);
+  }
+
   _renderCard(film) {
     const cardPresenter = new MovieCardPresenter(this._filmsListComponent, this._handleViewAction, this._handleModeChange);
     cardPresenter.init(film);
