@@ -70,10 +70,12 @@ export default class MovieList {
   }
 
   hide() {
+    this._sortComponent.getElement().classList.add(`visually-hidden`);
     this._filmsListComponent.getElement().classList.add(`visually-hidden`);
   }
 
   show() {
+    this._sortComponent.getElement().classList.remove(`visually-hidden`);
     this._filmsListComponent.getElement().classList.remove(`visually-hidden`);
   }
 

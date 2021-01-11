@@ -12,7 +12,7 @@ import FiltersPresenter from "./presenter/filters.js";
 import {generateFilm} from "./mock/film.js";
 import {getRandomInt} from "./utils/utils.js";
 import {render, RenderPosition} from "./utils/render.js";
-// import {MenuItem} from "./const.js";
+import {MenuItem} from "./const.js";
 
 const FILMS_AMOUNT = getRandomInt(0, 23);
 const films = new Array(FILMS_AMOUNT).fill().map(generateFilm);
@@ -34,20 +34,17 @@ const userProfilePresenter = new UserProfilePresenter(siteHeaderElement, filmsMo
 const filtersPresenter = new FiltersPresenter(siteNavigationElement, filtersModel, filmsModel);
 const movieListPresenter = new MovieListPresenter(siteMainElement, filmsModel, filtersModel);
 
-// const handleSiteMenuClick = (menuItem) => {
-//   switch (menuItem) {
-//     case MenuItem.MOVIELIST:
-//       // Показать доску
-//       // Скрыть статистику
-//       break;
-//     case MenuItem.STATISTICS:
-//       // Скрыть доску
-//       // Показать статистику
-//       break;
-//   }
-// };
+const handleSiteMenuClick = (menuItem) => {
+  if (menuItem === MenuItem.STATS) {
+    movieListPresenter.hide();
+    statsComponent.show();
+    return;
+  }
+  statsComponent.hide();
+  movieListPresenter.show();
+};
 
-// siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
+siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
 
 userProfilePresenter.init();
 filtersPresenter.init();
@@ -55,9 +52,6 @@ movieListPresenter.init();
 
 const statsComponent = new StatsView();
 render(siteMainElement, statsComponent, RenderPosition.BEFOREEND);
-
-statsComponent.show();
-movieListPresenter.hide();
 
 const footerStatisitcsElement = document.querySelector(`.footer__statistics`);
 render(footerStatisitcsElement, new FooterStatsView(films), RenderPosition.BEFOREEND);

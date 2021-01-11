@@ -28,5 +28,5 @@ export const MenuItem = {
   WATCHLIST: `watchlist`,
   HISTORY: `history`,
   FAVORITES: `favorites`,
-  STATISTICS: `stats`
+  STATS: `stats`
 };
