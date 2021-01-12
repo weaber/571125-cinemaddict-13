@@ -38,6 +38,7 @@ const handleSiteMenuClick = (menuItem) => {
   if (menuItem === MenuItem.STATS) {
     movieListPresenter.hide();
     statsComponent.show();
+    filtersPresenter.resetCurrentFilter();
     return;
   }
   statsComponent.hide();
@@ -50,8 +51,10 @@ userProfilePresenter.init();
 filtersPresenter.init();
 movieListPresenter.init();
 
-const statsComponent = new StatsView();
+const watchedFilms = filmsModel.getFilms().filter((film) => film.isWatched);
+const statsComponent = new StatsView(watchedFilms);
 render(siteMainElement, statsComponent, RenderPosition.BEFOREEND);
+statsComponent.hide();
 
 const footerStatisitcsElement = document.querySelector(`.footer__statistics`);
 render(footerStatisitcsElement, new FooterStatsView(films), RenderPosition.BEFOREEND);

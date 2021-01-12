@@ -30,3 +30,14 @@ export const MenuItem = {
   FAVORITES: `favorites`,
   STATS: `stats`
 };
+
+export const UserTitleMap = {
+  NOVICE: `Novice`,
+  FAN: `Fan`,
+  MOVIE_BUFF: `Movie Buff`
+};
+
+export const TemplateClasses = {
+  HIDDEN: `visually-hidden`,
+  HIDE_OVERFLOW: `hide-overflow`
+};

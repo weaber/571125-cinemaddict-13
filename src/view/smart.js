@@ -1,3 +1,4 @@
+import {TemplateClasses} from "../const.js";
 import AbstractView from "./abstract.js";
 
 export default class Smart extends AbstractView {
@@ -37,10 +38,10 @@ export default class Smart extends AbstractView {
   }
 
   show() {
-    this.getElement().classList.remove(`visually-hidden`);
+    this.getElement().classList.remove(TemplateClasses.HIDDEN);
   }
 
   hide() {
-    this.getElement().classList.add(`visually-hidden`);
+    this.getElement().classList.add(TemplateClasses.HIDDEN);
   }
 }
