@@ -1,7 +1,16 @@
 import SmartView from "./smart.js";
-import {UserTitleMap} from "../const.js";
+import dayjs from "dayjs";
+import {StatPeriodMap} from "../const.js";
 import Chart from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
+
+const getStatsDataForPeriod = {
+  [StatPeriodMap.ALL_TIME]: (films) => films,
+  [StatPeriodMap.TODAY]: (films, now = dayjs()) => films.filter((film) => dayjs(film.watchedData).isAfter(now.subtract(1, `day`))),
+  [StatPeriodMap.WEEK]: (films, now = dayjs()) => films.filter((film) => dayjs(film.watchedData).isAfter(now.subtract(1, `week`))),
+  [StatPeriodMap.MONTH]: (films, now = dayjs()) => films.filter((film) => dayjs(film.watchedData).isAfter(now.subtract(1, `month`))),
+  [StatPeriodMap.YEAR]: (films, now = dayjs()) => films.filter((film) => dayjs(film.watchedData).isAfter(now.subtract(1, `year`)))
+};
 
 const getGenresStats = (films) => {
   const genresStats = {};
@@ -30,19 +39,6 @@ const getTotalDuration = (films) => {
   const hours = (j >= 60) ? Math.floor(j / 60) : 0;
   const minutes = j % 60;
   return {hours, minutes};
-};
-
-const getUserTitle = (films) => {
-  const watchedFilmsAmount = films.filter((film) => film.isWatched).length;
-  if (watchedFilmsAmount === 0) {
-    return ``;
-  } else if (watchedFilmsAmount >= 21) {
-    return UserTitleMap.MOVIE_BUFF;
-  } else if (watchedFilmsAmount >= 10) {
-    return UserTitleMap.FAN;
-  } else {
-    return UserTitleMap.NOVICE;
-  }
 };
 
 const renderChart = (statisticCtx, films) => {
@@ -123,12 +119,12 @@ const renderChart = (statisticCtx, films) => {
   });
 };
 
-const createStatsTemplate = (films) => {
+const createStatsTemplate = (localData) => {
+  const {films, currentPeriod, userTitle} = localData;
+
   const filmsWatchedAmount = films.length;
   const {hours, minutes} = getTotalDuration(films);
   const topGenre = getTopGenre(films);
-  const userTitle = getUserTitle(films);
-
 
   return `<section class="statistic">
     <p class="statistic__rank">
@@ -140,19 +136,19 @@ const createStatsTemplate = (films) => {
     <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
       <p class="statistic__filters-description">Show stats:</p>
 
-      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-all-time" value="all-time" checked>
+      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-all-time" value="all-time" ${StatPeriodMap.ALL_TIME === currentPeriod ? `checked` : ``}>
       <label for="statistic-all-time" class="statistic__filters-label">All time</label>
 
-      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-today" value="today">
+      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-today" value="today" ${StatPeriodMap.TODAY === currentPeriod ? `checked` : ``}>
       <label for="statistic-today" class="statistic__filters-label">Today</label>
 
-      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-week" value="week">
+      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-week" value="week" ${StatPeriodMap.WEEK === currentPeriod ? `checked` : ``}>
       <label for="statistic-week" class="statistic__filters-label">Week</label>
 
-      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-month" value="month">
+      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-month" value="month" ${StatPeriodMap.MONTH === currentPeriod ? `checked` : ``}>
       <label for="statistic-month" class="statistic__filters-label">Month</label>
 
-      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-year" value="year">
+      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-year" value="year" ${StatPeriodMap.YEAR === currentPeriod ? `checked` : ``}>
       <label for="statistic-year" class="statistic__filters-label">Year</label>
     </form>
 
@@ -180,16 +176,45 @@ const createStatsTemplate = (films) => {
 };
 
 export default class Stats extends SmartView {
-  constructor(films) {
+  constructor(films, currentPeriod, userTitle) {
     super();
     this._films = films;
+    this._currentPeriod = currentPeriod;
+    this._userTitle = userTitle;
+    this._data = {films: this._films, currentPeriod: this._currentPeriod, userTitle: this._userTitle};
 
     this._chart = null;
     this._setChart();
+
+    this._statsPeriodChangeHandler = this._statsPeriodChangeHandler.bind(this);
+    this._setInnerHandler();
   }
 
   getTemplate() {
-    return createStatsTemplate(this._films);
+    return createStatsTemplate(this._data);
+  }
+
+  _statsPeriodChangeHandler(evt) {
+    evt.preventDefault();
+    const newStatsPeriod = evt.target.value;
+
+    if (this._currentPeriod === newStatsPeriod) {
+      return;
+    }
+
+    this._currentPeriod = newStatsPeriod;
+    const filteredFilms = getStatsDataForPeriod[this._currentPeriod](this._films);
+
+    this.updateData({films: filteredFilms, currentPeriod: this._currentPeriod});
+  }
+
+  _setInnerHandler() {
+    this.getElement().querySelector(`.statistic__filters`).addEventListener(`change`, this._statsPeriodChangeHandler);
+  }
+
+  restoreHandlers() {
+    this._setInnerHandler();
+    this._setChart();
   }
 
   _setChart() {
@@ -198,6 +223,6 @@ export default class Stats extends SmartView {
     }
 
     const statisticCtx = this.getElement().querySelector(`.statistic__chart`);
-    this._chart = renderChart(statisticCtx, this._films);
+    this._chart = renderChart(statisticCtx, this._data.films);
   }
 }

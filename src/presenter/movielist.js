@@ -70,12 +70,12 @@ export default class MovieList {
 
   hide() {
     this._sortComponent.getElement().classList.add(TemplateClasses.HIDDEN);
-    this._filmsListComponent.getElement().classList.add(TemplateClasses.HIDDEN);
+    this._filmsComponent.getElement().classList.add(TemplateClasses.HIDDEN);
   }
 
   show() {
     this._sortComponent.getElement().classList.remove(`visually-hidden`);
-    this._filmsListComponent.getElement().classList.remove(`visually-hidden`);
+    this._filmsComponent.getElement().classList.remove(`visually-hidden`);
   }
 
   _renderCard(film) {

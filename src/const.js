@@ -41,3 +41,11 @@ export const TemplateClasses = {
   HIDDEN: `visually-hidden`,
   HIDE_OVERFLOW: `hide-overflow`
 };
+
+export const StatPeriodMap = {
+  ALL_TIME: `all-time`,
+  TODAY: `today`,
+  WEEK: `week`,
+  MONTH: `month`,
+  YEAR: `year`
+};

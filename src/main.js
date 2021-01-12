@@ -11,8 +11,8 @@ import FiltersPresenter from "./presenter/filters.js";
 
 import {generateFilm} from "./mock/film.js";
 import {getRandomInt} from "./utils/utils.js";
-import {render, RenderPosition} from "./utils/render.js";
-import {MenuItem} from "./const.js";
+import {render, RenderPosition, replace} from "./utils/render.js";
+import {MenuItem, StatPeriodMap} from "./const.js";
 
 const FILMS_AMOUNT = getRandomInt(0, 23);
 const films = new Array(FILMS_AMOUNT).fill().map(generateFilm);
@@ -28,6 +28,7 @@ const siteMainElement = document.querySelector(`.main`);
 const siteMenuComponent = new MenuView();
 render(siteMainElement, siteMenuComponent, RenderPosition.BEFOREEND);
 
+let statsComponent = null;
 const siteNavigationElement = siteMainElement.querySelector(`.main-navigation`);
 
 const userProfilePresenter = new UserProfilePresenter(siteHeaderElement, filmsModel);
@@ -35,14 +36,28 @@ const filtersPresenter = new FiltersPresenter(siteNavigationElement, filtersMode
 const movieListPresenter = new MovieListPresenter(siteMainElement, filmsModel, filtersModel);
 
 const handleSiteMenuClick = (menuItem) => {
-  if (menuItem === MenuItem.STATS) {
+  if (menuItem !== MenuItem.STATS) {
+    statsComponent.hide();
+    movieListPresenter.show();
+    return;
+  }
+
+  let prevStatsComponent = statsComponent;
+  const watchedFilms = filmsModel.getFilms().filter((film) => film.isWatched);
+  const currentUserTitle = userProfilePresenter.getCurrentUserTitle();
+  statsComponent = new StatsView(watchedFilms, StatPeriodMap.ALL_TIME, currentUserTitle);
+  if (prevStatsComponent === null) {
     movieListPresenter.hide();
-    statsComponent.show();
+    render(siteMainElement, statsComponent, RenderPosition.BEFOREEND);
     filtersPresenter.resetCurrentFilter();
     return;
   }
-  statsComponent.hide();
-  movieListPresenter.show();
+
+  replace(statsComponent, prevStatsComponent);
+
+  movieListPresenter.hide();
+  statsComponent.show();
+  filtersPresenter.resetCurrentFilter();
 };
 
 siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
@@ -50,11 +65,6 @@ siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
 userProfilePresenter.init();
 filtersPresenter.init();
 movieListPresenter.init();
-
-const watchedFilms = filmsModel.getFilms().filter((film) => film.isWatched);
-const statsComponent = new StatsView(watchedFilms);
-render(siteMainElement, statsComponent, RenderPosition.BEFOREEND);
-statsComponent.hide();
 
 const footerStatisitcsElement = document.querySelector(`.footer__statistics`);
 render(footerStatisitcsElement, new FooterStatsView(films), RenderPosition.BEFOREEND);

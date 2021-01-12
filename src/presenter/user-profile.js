@@ -45,4 +45,8 @@ export default class UserProfile {
   _handleModelEvent() {
     this.init();
   }
+
+  getCurrentUserTitle() {
+    return this._userTitle;
+  }
 }
