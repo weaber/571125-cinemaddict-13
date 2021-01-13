@@ -27,6 +27,9 @@ const getGenresStats = (films) => {
 };
 
 const getTopGenre = (films) => {
+  if (films.length === 0) {
+    return false;
+  }
   const genresStats = getGenresStats(films);
   return Object.entries(genresStats).sort((a, b) => b[1] - a[1])[0][0];
 };
@@ -43,7 +46,7 @@ const getTotalDuration = (films) => {
 
 const renderChart = (statisticCtx, films) => {
   if (films.length === 0) {
-    return;
+    return false;
   }
 
   const labels = [];
