@@ -15,9 +15,10 @@ import {filter, sortByDate, sortByRating} from "../utils/utils.js";
 const FILMS_AMOUNT_PER_STEP = 5;
 
 export default class MovieList {
-  constructor(mainContainer, filmsModel, filtersModel) {
+  constructor(mainContainer, filmsModel, filtersModel, api) {
     this._showMoreButtonComponent = null;
     this._sortComponent = null;
+    this._api = api;
 
     this._filmsModel = filmsModel;
     this._filtersModel = filtersModel;
@@ -96,7 +97,9 @@ export default class MovieList {
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE_FILM:
-        this._filmsModel.updateFilm(updateType, update);
+        this._api.updateFilm(update).then((response) => {
+          this._filmsModel.updateFilm(updateType, response);
+        });
         break;
     }
   }

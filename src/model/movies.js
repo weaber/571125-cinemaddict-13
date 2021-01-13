@@ -59,23 +59,25 @@ export default class Films extends Observer {
         }
     );
 
-    delete adaptedFilm.film_info.title;
-    delete adaptedFilm.film_info.alternative_title;
-    delete adaptedFilm.film_info.poster;
-    delete adaptedFilm.film_info.total_rating;
-    delete adaptedFilm.film_info.director;
-    delete adaptedFilm.film_info.writers;
-    delete adaptedFilm.film_info.actors;
-    delete adaptedFilm.film_info.release.date;
-    delete adaptedFilm.film_info.runtime;
-    delete adaptedFilm.film_info.genre;
-    delete adaptedFilm.film_info.description;
-    delete adaptedFilm.film_info.release.release_country;
-    delete adaptedFilm.film_info.age_rating;
-    delete adaptedFilm.user_details.watchlist;
-    delete adaptedFilm.user_details.already_watched;
-    delete adaptedFilm.user_details.watching_date;
-    delete adaptedFilm.user_details.favorite;
+    delete adaptedFilm.film_info;
+    // delete adaptedFilm.film_info.title;
+    // delete adaptedFilm.film_info.alternative_title;
+    // delete adaptedFilm.film_info.poster;
+    // delete adaptedFilm.film_info.total_rating;
+    // delete adaptedFilm.film_info.director;
+    // delete adaptedFilm.film_info.writers;
+    // delete adaptedFilm.film_info.actors;
+    // delete adaptedFilm.film_info.release.date;
+    // delete adaptedFilm.film_info.runtime;
+    // delete adaptedFilm.film_info.genre;
+    // delete adaptedFilm.film_info.description;
+    // delete adaptedFilm.film_info.release.release_country;
+    // delete adaptedFilm.film_info.age_rating;
+    delete adaptedFilm.user_details;
+    // delete adaptedFilm.user_details.watchlist;
+    // delete adaptedFilm.user_details.already_watched;
+    // delete adaptedFilm.user_details.watching_date;
+    // delete adaptedFilm.user_details.favorite;
 
     return adaptedFilm;
   }
@@ -85,26 +87,63 @@ export default class Films extends Observer {
         {},
         film,
         {
-          "film_info.title": film.name,
-          "film_info.alternative_title": film.originalName,
-          "film_info.poster": film.poster,
-          "film_info.total_rating": film.rating,
-          "film_info.director": film.director,
-          "film_info.writers": film.writers,
-          "film_info.actors": film.actors,
-          "film_info.release.date": film.filmDate,
-          "film_info.runtime": film.filmDuration,
-          "film_info.genre": film.genres,
-          "film_info.description": film.description,
-          "film_info.release.release_country": film.country,
-          "film_info.age_rating": film.age,
-          "user_details.watchlist": film.isWatchlist,
-          "user_details.already_watched": film.isWatched,
-          "user_details.watching_date": film.watchedData,
-          "user_details.favorite": film.isFavorite
-
+          "film_info": {
+            "title": film.name,
+            "alternative_title": film.originalName,
+            "poster": film.poster,
+            "total_rating": film.rating,
+            "director": film.director,
+            "writers": film.writers,
+            "actors": film.actors,
+            "runtime": film.filmDuration,
+            "age_rating": film.age,
+            "genre": film.genres,
+            "description": film.description,
+            "release": {
+              "date": film.filmDate,
+              "release_country": film.country
+            }
+          },
+          "user_details": {
+            "watchlist": film.isWatchlist,
+            "already_watched": film.isWatched,
+            "watching_date": film.watchedData,
+            "favorite": film.isFavorite
+          }
         }
     );
+
+    // const filmInfo = {
+    //   "title": film.name,
+    //   "alternative_title": film.originalName,
+    //   "poster": film.poster,
+    //   "total_rating": film.rating,
+    //   "director": film.director,
+    //   "writers": film.writers,
+    //   "actors": film.actors,
+    //   "release": {
+    //     "date": film.filmDate,
+    //     "release_country": film.country
+    //   },
+    //   "runtime": film.filmDuration,
+    //   "genre": film.genres,
+    //   "description": film.description,
+    //   "age_rating": film.age,
+    // };
+
+    // const userDetails = {
+    //   "watchlist": film.isWatchlist,
+    //   "already_watched": film.isWatched,
+    //   "watching_date": film.watchedData,
+    //   "favorite": film.isFavorite
+    // };
+
+    // const adaptedFilm = {
+    //   [`film_info`]: filmInfo,
+    //   [`user_details`]: userDetails,
+    //   id: film.id,
+    //   comments: film.comments
+    // };
 
     delete adaptedFilm.name;
     delete adaptedFilm.originalName;

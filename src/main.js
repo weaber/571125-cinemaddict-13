@@ -39,7 +39,7 @@ const siteNavigationElement = siteMainElement.querySelector(`.main-navigation`);
 
 const userProfilePresenter = new UserProfilePresenter(siteHeaderElement, filmsModel);
 const filtersPresenter = new FiltersPresenter(siteNavigationElement, filtersModel, filmsModel);
-const movieListPresenter = new MovieListPresenter(siteMainElement, filmsModel, filtersModel);
+const movieListPresenter = new MovieListPresenter(siteMainElement, filmsModel, filtersModel, api);
 
 const handleSiteMenuClick = (menuItem) => {
   if (menuItem !== MenuItem.STATS) {
