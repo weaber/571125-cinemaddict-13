@@ -83,7 +83,7 @@ export default class MovieList {
   }
 
   _renderCard(film) {
-    const cardPresenter = new MovieCardPresenter(this._filmsListComponent, this._handleViewAction, this._handleModeChange);
+    const cardPresenter = new MovieCardPresenter(this._filmsListComponent, this._handleViewAction, this._handleModeChange, this._api);
     cardPresenter.init(film);
     this._cardPresenter[film.id] = cardPresenter;
   }
