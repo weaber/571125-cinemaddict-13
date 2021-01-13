@@ -14,6 +14,7 @@ const createFilmDetailsInfoTemplate = (data) => {
     poster,
     age,
     name,
+    // originalName,
     description,
     rating,
     director,
