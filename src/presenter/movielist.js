@@ -8,9 +8,8 @@ import MostCommentedView from "../view/mostcommented.js";
 import ShowMoreButtonView from "../view/showmore-button.js";
 import MovieCardPresenter from "./movie.js";
 import {render, RenderPosition, remove} from "../utils/render.js";
-import {SortType, UserAction, UpdateType} from "../const.js";
+import {SortType, UserAction, UpdateType, TemplateClasses} from "../const.js";
 import {filter, sortByDate, sortByRating} from "../utils/utils.js";
-
 
 const FILMS_AMOUNT_PER_STEP = 5;
 
@@ -67,6 +66,16 @@ export default class MovieList {
 
   init() {
     this._renderMainContent();
+  }
+
+  hide() {
+    this._sortComponent.getElement().classList.add(TemplateClasses.HIDDEN);
+    this._filmsComponent.getElement().classList.add(TemplateClasses.HIDDEN);
+  }
+
+  show() {
+    this._sortComponent.getElement().classList.remove(`visually-hidden`);
+    this._filmsComponent.getElement().classList.remove(`visually-hidden`);
   }
 
   _renderCard(film) {

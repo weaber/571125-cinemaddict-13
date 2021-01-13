@@ -1,3 +1,4 @@
+import {TemplateClasses} from "../const.js";
 import AbstractView from "./abstract.js";
 
 export default class Smart extends AbstractView {
@@ -34,5 +35,13 @@ export default class Smart extends AbstractView {
 
   restoreHandlers() {
     throw new Error(`Abstract method not implemented: resetHandlers`);
+  }
+
+  show() {
+    this.getElement().classList.remove(TemplateClasses.HIDDEN);
+  }
+
+  hide() {
+    this.getElement().classList.add(TemplateClasses.HIDDEN);
   }
 }

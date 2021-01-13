@@ -1,7 +1,7 @@
 import FilmCardView from "../view/film-card.js";
 import PopupView from "../view/popup.js";
 import {remove, render, RenderPosition, replace} from "../utils/render.js";
-import {UserAction, UpdateType} from "../const.js";
+import {UserAction, UpdateType, TemplateClasses} from "../const.js";
 import CommentsModel from "../model/comments.js";
 import {getComments, deleteComment, addComment} from "../mock/comments.js";
 
@@ -9,8 +9,6 @@ const Mode = {
   DEFAULT: `DEFAULT`,
   POPUP: `POPUP`
 };
-
-const page = document.querySelector(`body`);
 
 export default class Movie {
   constructor(movieListContainer, changeData, changeMode) {
@@ -76,7 +74,7 @@ export default class Movie {
       replace(this._cardComponent, prevCardComponent);
     }
 
-    if (page.contains(prevPopupComponent.getElement())) {
+    if (this._bodyElement.contains(prevPopupComponent.getElement())) {
       replace(this._popupComponent, prevPopupComponent);
     }
 
@@ -100,6 +98,7 @@ export default class Movie {
     this._mode = Mode.POPUP;
 
     render(this._bodyElement, this._popupComponent, RenderPosition.BEFOREEND);
+    this._bodyElement.classList.add(TemplateClasses.HIDE_OVERFLOW);
     document.addEventListener(`keydown`, this._handleFormSubmit);
     document.addEventListener(`keydown`, this._popupEscPressHandler);
   }
@@ -107,6 +106,7 @@ export default class Movie {
   _closePopup() {
     this._mode = Mode.DEFAULT;
     remove(this._popupComponent);
+    this._bodyElement.classList.remove(TemplateClasses.HIDE_OVERFLOW);
     document.removeEventListener(`keydown`, this._popupEscPressHandler);
     document.removeEventListener(`keydown`, this._handleFormSubmit);
   }
@@ -169,7 +169,8 @@ export default class Movie {
             {},
             this._film,
             {
-              isWatched: !this._film.isWatched
+              isWatched: !this._film.isWatched,
+              watchedData: (!this._film.isWatched) ? new Date() : null
             }
         )
     );

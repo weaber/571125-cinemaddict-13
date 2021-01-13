@@ -1,11 +1,6 @@
 import UserProfileView from "../view/user-profile.js";
 import {render, RenderPosition, remove, replace} from "../utils/render.js";
-
-const UserTitleMap = {
-  NOVICE: `Novice`,
-  FAN: `Fan`,
-  MOVIE_BUFF: `Movie Buff`
-};
+import {UserTitleMap} from "../const.js";
 
 export default class UserProfile {
   constructor(userProfileContainer, filmsModel) {
@@ -49,5 +44,9 @@ export default class UserProfile {
 
   _handleModelEvent() {
     this.init();
+  }
+
+  getCurrentUserTitle() {
+    return this._userTitle;
   }
 }

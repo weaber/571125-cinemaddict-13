@@ -19,8 +19,12 @@ export default class Filters {
     this._filtersModel.addObserver(this._handleModelEvent);
   }
 
-  init() {
-    this._currentFilter = this._filtersModel.getFilter();
+  init(isFilterReset = false) {
+    if (isFilterReset) {
+      this._currentFilter = null;
+    } else {
+      this._currentFilter = this._filtersModel.getFilter();
+    }
 
     const filters = this._getFilters();
     const prevFiltersComponent = this._filtersComponent;
@@ -29,7 +33,7 @@ export default class Filters {
     this._filtersComponent.setFilterTypeChangeHandler(this._handleFilterTypeChange);
 
     if (prevFiltersComponent === null) {
-      render(this._filtersContainer, this._filtersComponent, RenderPosition.BEFOREEND);
+      render(this._filtersContainer, this._filtersComponent, RenderPosition.AFTERBEGIN);
       return;
     }
 
@@ -72,5 +76,9 @@ export default class Filters {
         count: filter[FilterType.FAVORITES](films).length
       }
     ];
+  }
+
+  resetCurrentFilter() {
+    this.init(true);
   }
 }

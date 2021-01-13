@@ -111,6 +111,8 @@ const generateComments = (movieId) => {
 
 export const generateFilm = () => {
   const id = generateId();
+  const isWatched = Boolean(getRandomInt(0, 1));
+  const watchedData = (isWatched) ? generateDate(30, `days`) : null;
   return {
     id,
     name: generateFilmName(),
@@ -127,7 +129,8 @@ export const generateFilm = () => {
     country: generateCountry(),
     age: generateAge(),
     isWatchlist: Boolean(getRandomInt(0, 1)),
-    isWatched: Boolean(getRandomInt(0, 1)),
+    isWatched,
+    watchedData,
     isFavorite: Boolean(getRandomInt(0, 1)),
     comments: generateComments(id)
   };
