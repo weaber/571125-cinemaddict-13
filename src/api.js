@@ -15,8 +15,7 @@ export default class Api {
   }
 
   getFilms() {
-    return this._load({url: `movies`})
-      .then(Api.toJSON);
+    return this._load({url: `movies`}).then(Api.toJSON);
   }
 
   updateFilm(film) {
@@ -46,7 +45,7 @@ export default class Api {
 
   }
 
-  checkStatus(response) {
+  static checkStatus(response) {
     if (
       response.status < SuccessHTTPStatusRange.MIN ||
       response.status > SuccessHTTPStatusRange.MAX
@@ -58,11 +57,11 @@ export default class Api {
 
   }
 
-  toJSON(response) {
+  static toJSON(response) {
     return response.json();
   }
 
-  catchError(err) {
+  static catchError(err) {
     throw err;
   }
 }
