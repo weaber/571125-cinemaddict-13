@@ -22,9 +22,10 @@ const END_POINT = `https://13.ecmascript.pages.academy/cinemaddict`;
 const FILMS_AMOUNT = getRandomInt(0, 23);
 const films = new Array(FILMS_AMOUNT).fill().map(generateFilm);
 const api = new Api(END_POINT, AUTHORIZATION);
+// console.log(films);
 
-api.getFilms().then((films) => {
-  console.log(films);
+api.getFilms().then((items) => {
+  console.log(items);
   // Есть проблема: cтруктура объекта похожа, но некоторые ключи называются иначе,
   // а ещё на сервере используется snake_case, а у нас camelCase.
   // Можно, конечно, переписать часть нашего клиентского приложения, но зачем?
