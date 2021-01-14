@@ -21,6 +21,7 @@ const filtersModel = new FiltersModel();
 
 const siteHeaderElement = document.querySelector(`.header`);
 const siteMainElement = document.querySelector(`.main`);
+const footerStatisitcsElement = document.querySelector(`.footer__statistics`);
 
 const siteMenuComponent = new MenuView();
 render(siteMainElement, siteMenuComponent, RenderPosition.BEFOREEND);
@@ -66,10 +67,10 @@ movieListPresenter.init();
 api.getFilms()
   .then((films) => {
     filmsModel.setFilms(UpdateType.INIT, films);
-    const footerStatisitcsElement = document.querySelector(`.footer__statistics`);
     render(footerStatisitcsElement, new FooterStatsView(filmsModel.getFilms()), RenderPosition.BEFOREEND);
   })
   .catch(() => {
     filmsModel.setFilms(UpdateType.INIT, []);
+    render(footerStatisitcsElement, new FooterStatsView(filmsModel.getFilms()), RenderPosition.BEFOREEND);
   });
 
