@@ -1,6 +1,7 @@
 import SortView from "../view/sort.js";
 import FilmsContentView from "../view/films-content-container.js";
 import MainFilmsListContentView from "../view/main-films-list.js";
+import LoadingView from "../view/loading.js";
 import NoFilmsView from "../view/no-films.js";
 import FilmsListView from "../view/films-list-container.js";
 import TopRatedView from "../view/toprated.js";
@@ -14,9 +15,10 @@ import {filter, sortByDate, sortByRating} from "../utils/utils.js";
 const FILMS_AMOUNT_PER_STEP = 5;
 
 export default class MovieList {
-  constructor(mainContainer, filmsModel, filtersModel) {
+  constructor(mainContainer, filmsModel, filtersModel, api) {
     this._showMoreButtonComponent = null;
     this._sortComponent = null;
+    this._api = api;
 
     this._filmsModel = filmsModel;
     this._filtersModel = filtersModel;
@@ -25,11 +27,13 @@ export default class MovieList {
 
     this._cardPresenter = {};
     this._currentSortType = SortType.DEFAULT;
+    this._isLoading = true;
 
     this._filmsComponent = new FilmsContentView();
     this._mainFilmsListComponent = new MainFilmsListContentView();
     this._filmsListComponent = new FilmsListView();
     this._noFilmsComponent = new NoFilmsView();
+    this._loadingComponent = new LoadingView();
 
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
 
@@ -79,7 +83,7 @@ export default class MovieList {
   }
 
   _renderCard(film) {
-    const cardPresenter = new MovieCardPresenter(this._filmsListComponent, this._handleViewAction, this._handleModeChange);
+    const cardPresenter = new MovieCardPresenter(this._filmsListComponent, this._handleViewAction, this._handleModeChange, this._api);
     cardPresenter.init(film);
     this._cardPresenter[film.id] = cardPresenter;
   }
@@ -91,35 +95,36 @@ export default class MovieList {
   }
 
   _handleViewAction(actionType, updateType, update) {
-    // console.log(`Клик View`);
-    // console.log(actionType, updateType, update);
-    // Здесь будем вызывать обновление модели.
-    // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
-    // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
-    // update - обновленные данные
     switch (actionType) {
       case UserAction.UPDATE_FILM:
-        this._filmsModel.updateFilm(updateType, update);
+        this._api.updateFilm(update).then((response) => {
+          this._filmsModel.updateFilm(updateType, response);
+        });
         break;
     }
   }
 
   _handleModelEvent(updateType, data) {
-    // console.log(`Модель`);
-    // console.log(updateType, data);
     switch (updateType) {
       case UpdateType.PATCH:
-      // Перерисовываю конкретную карточку фильма (по клику на isWatched etc)
         this._cardPresenter[data.id].init(data);
-        break;
-      case UpdateType.MINOR:
-      // Тут пока про запас
         break;
       case UpdateType.MAJOR:
         this._clearMainContent({resetRenderedFilmsAmount: true, resetSortType: false});
         this._renderMainContent();
         break;
+      case UpdateType.INIT:
+        this._isLoading = false;
+        remove(this._loadingComponent);
+        this._renderMainContent();
+        break;
     }
+  }
+
+  _renderLoading() {
+    render(this._mainContainer, this._filmsComponent, RenderPosition.BEFOREEND);
+    render(this._filmsComponent, this._mainFilmsListComponent, RenderPosition.BEFOREEND);
+    render(this._mainFilmsListComponent, this._loadingComponent, RenderPosition.AFTERBEGIN);
   }
 
   _clearMainContent({resetRenderedFilmsAmount = false, resetSortType = false} = {}) {
@@ -130,6 +135,7 @@ export default class MovieList {
     this._cardPresenter = {};
     remove(this._noFilmsComponent);
     remove(this._sortComponent);
+    remove(this._loadingComponent);
     remove(this._showMoreButtonComponent);
 
     if (resetRenderedFilmsAmount) {
@@ -173,9 +179,7 @@ export default class MovieList {
       return;
     }
     this._currentSortType = sortType;
-    // console.log(this._renderedFilmsAmount);
     this._clearMainContent({resetRenderedFilmsAmount: true});
-    // console.log(this._renderedFilmsAmount);
     this._renderMainContent();
   }
 
@@ -218,6 +222,11 @@ export default class MovieList {
   }
 
   _renderMainContent() {
+    if (this._isLoading) {
+      this._renderLoading();
+      return;
+    }
+
     const films = this._getFilms();
     const filmsAmount = films.length;
 

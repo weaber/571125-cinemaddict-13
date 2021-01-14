@@ -14,6 +14,7 @@ const createFilmDetailsInfoTemplate = (data) => {
     poster,
     age,
     name,
+    originalName,
     description,
     rating,
     director,
@@ -43,7 +44,7 @@ const createFilmDetailsInfoTemplate = (data) => {
   <div class="film-details__info-head">
     <div class="film-details__title-wrap">
       <h3 class="film-details__title">${name}</h3>
-      <p class="film-details__title-original">Original: ${name}</p>
+      <p class="film-details__title-original">Original: ${originalName}</p>
     </div>
 
     <div class="film-details__rating">

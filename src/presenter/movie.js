@@ -3,7 +3,8 @@ import PopupView from "../view/popup.js";
 import {remove, render, RenderPosition, replace} from "../utils/render.js";
 import {UserAction, UpdateType, TemplateClasses} from "../const.js";
 import CommentsModel from "../model/comments.js";
-import {getComments, deleteComment, addComment} from "../mock/comments.js";
+// import {getComments, deleteComment, addComment} from "../mock/comments.js";
+import {deleteComment, addComment} from "../mock/comments.js";
 
 const Mode = {
   DEFAULT: `DEFAULT`,
@@ -11,7 +12,8 @@ const Mode = {
 };
 
 export default class Movie {
-  constructor(movieListContainer, changeData, changeMode) {
+  constructor(movieListContainer, changeData, changeMode, api) {
+    this._api = api;
     this._bodyElement = document.querySelector(`body`);
     this._movieListContainer = movieListContainer;
 
@@ -46,16 +48,16 @@ export default class Movie {
     const prevPopupComponent = this._popupComponent;
 
     this._cardComponent = new FilmCardView(this._film);
-    this._commentsModel.setComments(getComments(this._film.id));
+    // this._commentsModel.setComments(getComments(this._film.id));
 
-    this._popupComponent = new PopupView(this._film, this._commentsModel.getComments());
+    // this._popupComponent = new PopupView(this._film, this._commentsModel.getComments());
 
-    this._popupComponent.setCloseClickHandler(this._closePopup);
-    this._popupComponent.setWatchlistClickHandler(this._handleWatchlistClick);
-    this._popupComponent.setWatchedClickHandler(this._handleWatchedClick);
-    this._popupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
-    this._popupComponent.setDeleteButtonClickHandler(this._handleDeleteButtonClick);
-    this._popupComponent.restoreHandlers();
+    // this._popupComponent.setCloseClickHandler(this._closePopup);
+    // this._popupComponent.setWatchlistClickHandler(this._handleWatchlistClick);
+    // this._popupComponent.setWatchedClickHandler(this._handleWatchedClick);
+    // this._popupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+    // this._popupComponent.setDeleteButtonClickHandler(this._handleDeleteButtonClick);
+    // this._popupComponent.restoreHandlers();
 
 
     this._cardComponent.setPosterClickHandler(this._showPopup);
@@ -96,6 +98,20 @@ export default class Movie {
   _showPopup() {
     this._changeMode();
     this._mode = Mode.POPUP;
+
+    this._api.getComments(this._film.id)
+      .then((comments) => {
+        this._commentsModel.setComments(comments);
+        this._popupComponent = new PopupView(this._film, this._commentsModel.getComments());
+        this._popupComponent.setCloseClickHandler(this._closePopup);
+      });
+
+
+    // this._popupComponent.setWatchlistClickHandler(this._handleWatchlistClick);
+    // this._popupComponent.setWatchedClickHandler(this._handleWatchedClick);
+    // this._popupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+    // this._popupComponent.setDeleteButtonClickHandler(this._handleDeleteButtonClick);
+    // this._popupComponent.restoreHandlers();
 
     render(this._bodyElement, this._popupComponent, RenderPosition.BEFOREEND);
     this._bodyElement.classList.add(TemplateClasses.HIDE_OVERFLOW);
