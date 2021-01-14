@@ -3,8 +3,6 @@ import PopupView from "../view/popup.js";
 import {remove, render, RenderPosition, replace} from "../utils/render.js";
 import {UserAction, UpdateType, TemplateClasses} from "../const.js";
 import CommentsModel from "../model/comments.js";
-// import {getComments, deleteComment, addComment} from "../mock/comments.js";
-// import {deleteComment, addComment} from "../mock/comments.js";
 
 const Mode = {
   DEFAULT: `DEFAULT`,
@@ -142,14 +140,11 @@ export default class Movie {
   _handleFormSubmit(evt) {
     if (evt.ctrlKey && evt.key === `Enter`) {
       const localComment = this._popupComponent.getNewComment();
-
-      if (localComment.newEmotion === `` || localComment.text === ``) {
+      if (localComment.emotion === `` || localComment.text === ``) {
         return;
       }
 
       localComment.date = new Date();
-      localComment.emotion = localComment.newEmotion;
-      delete localComment.newEmotion;
       this._api.addComment(this._film.id, localComment);
 
       // this._commentsModel.addComment(

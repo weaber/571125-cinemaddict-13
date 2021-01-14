@@ -6,7 +6,7 @@ dayjs.extend(relativeTime);
 
 const BLANK_COMMENT = {
   text: ``,
-  newEmotion: ``
+  emotion: ``
 };
 
 const createFilmDetailsInfoTemplate = (data) => {
@@ -149,10 +149,10 @@ const createCommentsTemplate = (comments) => {
 const createNewCommentTemplate = (localComment) => {
   const {
     text,
-    newEmotion
+    emotion
   } = localComment;
 
-  const newEmojiPicture = (newEmotion) ? `<img src=${EmotionPicsMap[newEmotion]} width="55" height="55" alt="emoji-${newEmotion}">` : ``;
+  const newEmojiPicture = (emotion) ? `<img src=${EmotionPicsMap[emotion]} width="55" height="55" alt="emoji-${emotion}">` : ``;
 
   return `<div class="film-details__add-emoji-label">${newEmojiPicture}</div>
 
@@ -306,7 +306,7 @@ export default class Popup extends SmartView {
         {},
         this._localComment,
         {
-          newEmotion: evt.target.value,
+          emotion: evt.target.value,
         }
     );
     let currentScrollYPosition = this.getElement().scrollTop;

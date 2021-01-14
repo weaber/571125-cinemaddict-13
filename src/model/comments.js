@@ -38,7 +38,6 @@ export default class Comments extends Observer {
   }
 
   static adaptToClient(comments) {
-    // console.log(comments);
     const adaptedComment = Object.assign(
         {},
         comments,
@@ -48,8 +47,6 @@ export default class Comments extends Observer {
     );
 
     delete adaptedComment.comment;
-
-    // console.log(adaptedComment);
     return adaptedComment;
   }
 
