@@ -4,7 +4,7 @@ import {remove, render, RenderPosition, replace} from "../utils/render.js";
 import {UserAction, UpdateType, TemplateClasses} from "../const.js";
 import CommentsModel from "../model/comments.js";
 // import {getComments, deleteComment, addComment} from "../mock/comments.js";
-import {deleteComment, addComment} from "../mock/comments.js";
+// import {deleteComment, addComment} from "../mock/comments.js";
 
 const Mode = {
   DEFAULT: `DEFAULT`,
@@ -45,7 +45,7 @@ export default class Movie {
     this._film = film;
 
     const prevCardComponent = this._cardComponent;
-    const prevPopupComponent = this._popupComponent;
+    // const prevPopupComponent = this._popupComponent;
 
     this._cardComponent = new FilmCardView(this._film);
     // this._commentsModel.setComments(getComments(this._film.id));
@@ -67,7 +67,8 @@ export default class Movie {
     this._cardComponent.setWatchedClickHandler(this._handleWatchedClick);
     this._cardComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
-    if (prevCardComponent === null || prevPopupComponent === null) {
+    // if (prevCardComponent === null || prevPopupComponent === null) {
+    if (prevCardComponent === null) {
       render(this._movieListContainer, this._cardComponent, RenderPosition.BEFOREEND);
       return;
     }
@@ -76,11 +77,11 @@ export default class Movie {
       replace(this._cardComponent, prevCardComponent);
     }
 
-    if (this._bodyElement.contains(prevPopupComponent.getElement())) {
-      replace(this._popupComponent, prevPopupComponent);
-    }
+    // if (this._bodyElement.contains(prevPopupComponent.getElement())) {
+    //   replace(this._popupComponent, prevPopupComponent);
+    // }
 
-    remove(prevPopupComponent);
+    // remove(prevPopupComponent);
     remove(prevCardComponent);
   }
 
@@ -96,15 +97,20 @@ export default class Movie {
   }
 
   _showPopup() {
+    console.log(`Тут`);
     this._changeMode();
     this._mode = Mode.POPUP;
 
     this._api.getComments(this._film.id)
       .then((comments) => {
         this._commentsModel.setComments(comments);
-        this._popupComponent = new PopupView(this._film, this._commentsModel.getComments());
-        this._popupComponent.setCloseClickHandler(this._closePopup);
+
       });
+
+    // Получается, когда я запускаю строку ниже, комментарии еще не получены с сервера;
+
+    this._popupComponent = new PopupView(this._film, this._commentsModel.getComments());
+    this._popupComponent.setCloseClickHandler(this._closePopup);
 
 
     // this._popupComponent.setWatchlistClickHandler(this._handleWatchlistClick);
@@ -153,6 +159,8 @@ export default class Movie {
       localComment.author = `Random Man`;
       localComment.emotion = localComment.newEmotion;
       localComment.id = Date.now() + parseInt(Math.random() * 10000, 10);
+
+      delete localComment.newEmotion;
 
       addComment(this._film.id, localComment);
 

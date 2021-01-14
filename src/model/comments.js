@@ -8,9 +8,11 @@ export default class Comments extends Observer {
 
   setComments(comments) {
     this._comments = comments.slice();
+    console.log(this._comments);
   }
 
   getComments() {
+    console.log(this._comments);
     return this._comments;
   }
 
