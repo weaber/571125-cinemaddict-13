@@ -45,19 +45,11 @@ export default class Movie {
     this._film = film;
 
     const prevCardComponent = this._cardComponent;
-    // const prevPopupComponent = this._popupComponent;
-
     this._cardComponent = new FilmCardView(this._film);
+
+    // const prevPopupComponent = this._popupComponent;
     // this._commentsModel.setComments(getComments(this._film.id));
-
     // this._popupComponent = new PopupView(this._film, this._commentsModel.getComments());
-
-    // this._popupComponent.setCloseClickHandler(this._closePopup);
-    // this._popupComponent.setWatchlistClickHandler(this._handleWatchlistClick);
-    // this._popupComponent.setWatchedClickHandler(this._handleWatchedClick);
-    // this._popupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
-    // this._popupComponent.setDeleteButtonClickHandler(this._handleDeleteButtonClick);
-    // this._popupComponent.restoreHandlers();
 
 
     this._cardComponent.setPosterClickHandler(this._showPopup);
@@ -97,32 +89,32 @@ export default class Movie {
   }
 
   _showPopup() {
-    console.log(`Тут`);
-    this._changeMode();
-    this._mode = Mode.POPUP;
+    // this._changeMode();
+    // this._mode = Mode.POPUP;
+
+    // А вот тут нужно закрывать открытый поп-ап если такой есть!
 
     this._api.getComments(this._film.id)
       .then((comments) => {
         this._commentsModel.setComments(comments);
 
+        this._popupComponent = new PopupView(this._film, this._commentsModel.getComments());
+        this._popupComponent.setCloseClickHandler(this._closePopup);
+
+        this._popupComponent.setWatchlistClickHandler(this._handleWatchlistClick);
+        this._popupComponent.setWatchedClickHandler(this._handleWatchedClick);
+        this._popupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+        this._popupComponent.setDeleteButtonClickHandler(this._handleDeleteButtonClick);
+        this._popupComponent.restoreHandlers();
+
+        render(this._bodyElement, this._popupComponent, RenderPosition.BEFOREEND);
+        this._bodyElement.classList.add(TemplateClasses.HIDE_OVERFLOW);
+        document.addEventListener(`keydown`, this._handleFormSubmit);
+        document.addEventListener(`keydown`, this._popupEscPressHandler);
       });
 
-    // Получается, когда я запускаю строку ниже, комментарии еще не получены с сервера;
-
-    this._popupComponent = new PopupView(this._film, this._commentsModel.getComments());
-    this._popupComponent.setCloseClickHandler(this._closePopup);
-
-
-    // this._popupComponent.setWatchlistClickHandler(this._handleWatchlistClick);
-    // this._popupComponent.setWatchedClickHandler(this._handleWatchedClick);
-    // this._popupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
-    // this._popupComponent.setDeleteButtonClickHandler(this._handleDeleteButtonClick);
-    // this._popupComponent.restoreHandlers();
-
-    render(this._bodyElement, this._popupComponent, RenderPosition.BEFOREEND);
-    this._bodyElement.classList.add(TemplateClasses.HIDE_OVERFLOW);
-    document.addEventListener(`keydown`, this._handleFormSubmit);
-    document.addEventListener(`keydown`, this._popupEscPressHandler);
+    // Получается, если код инициации попапа сделать ниже, комментарии еще не получены с сервера, и он некорректно отрабатывает
+    // поэтому я его переместил в api
   }
 
   _closePopup() {
@@ -143,8 +135,8 @@ export default class Movie {
   }
 
   _handleDeleteButtonClick(commentId) {
-    deleteComment(this._film.id, commentId);
-    this._commentsModel.deleteComment(UserAction.DELETE_COMMENT, commentId);
+    this._api.deleteComment(commentId)
+      .then(() => this._commentsModel.deleteComment(UserAction.DELETE_COMMENT, commentId));
   }
 
   _handleFormSubmit(evt) {
@@ -156,18 +148,14 @@ export default class Movie {
       }
 
       localComment.date = new Date();
-      localComment.author = `Random Man`;
       localComment.emotion = localComment.newEmotion;
-      localComment.id = Date.now() + parseInt(Math.random() * 10000, 10);
-
       delete localComment.newEmotion;
+      this._api.addComment(this._film.id, localComment);
 
-      addComment(this._film.id, localComment);
-
-      this._commentsModel.addComment(
-          UserAction.ADD_COMMENT,
-          localComment
-      );
+      // this._commentsModel.addComment(
+      //     UserAction.ADD_COMMENT,
+      //     localComment
+      // );
     }
   }
 
