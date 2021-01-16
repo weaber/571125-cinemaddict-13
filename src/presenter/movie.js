@@ -40,15 +40,11 @@ export default class Movie {
   }
 
   init(film) {
+    // console.log(this._mode);
     this._film = film;
 
     const prevCardComponent = this._cardComponent;
     this._cardComponent = new FilmCardView(this._film);
-
-    // const prevPopupComponent = this._popupComponent;
-    // this._commentsModel.setComments(getComments(this._film.id));
-    // this._popupComponent = new PopupView(this._film, this._commentsModel.getComments());
-
 
     this._cardComponent.setPosterClickHandler(this._showPopup);
     this._cardComponent.setTitleClickHandler(this._showPopup);
@@ -57,7 +53,6 @@ export default class Movie {
     this._cardComponent.setWatchedClickHandler(this._handleWatchedClick);
     this._cardComponent.setFavoriteClickHandler(this._handleFavoriteClick);
 
-    // if (prevCardComponent === null || prevPopupComponent === null) {
     if (prevCardComponent === null) {
       render(this._movieListContainer, this._cardComponent, RenderPosition.BEFOREEND);
       return;
@@ -70,6 +65,12 @@ export default class Movie {
     // if (this._bodyElement.contains(prevPopupComponent.getElement())) {
     //   replace(this._popupComponent, prevPopupComponent);
     // }
+
+    // Типа если был режим попапа, значит удаляем прошлый попап и делаем новый, но у меня экран моргает, видно что перерендеринг
+    // наверное это неправильно
+    if (this._mode === Mode.POPUP) {
+      this._showPopup();
+    }
 
     // remove(prevPopupComponent);
     remove(prevCardComponent);
@@ -88,9 +89,9 @@ export default class Movie {
 
   _showPopup() {
     // this._changeMode();
-    // this._mode = Mode.POPUP;
+    this._mode = Mode.POPUP;
 
-    // А вот тут нужно закрывать открытый поп-ап если такой есть!
+    const prevPopupComponent = this._popupComponent;
 
     this._api.getComments(this._film.id)
       .then((comments) => {
@@ -105,14 +106,19 @@ export default class Movie {
         this._popupComponent.setDeleteButtonClickHandler(this._handleDeleteButtonClick);
         this._popupComponent.restoreHandlers();
 
-        render(this._bodyElement, this._popupComponent, RenderPosition.BEFOREEND);
-        this._bodyElement.classList.add(TemplateClasses.HIDE_OVERFLOW);
-        document.addEventListener(`keydown`, this._handleFormSubmit);
-        document.addEventListener(`keydown`, this._popupEscPressHandler);
-      });
+        if (prevPopupComponent !== null && this._bodyElement.contains(prevPopupComponent.getElement())) {
+          replace(this._popupComponent, prevPopupComponent);
+          this._bodyElement.classList.add(TemplateClasses.HIDE_OVERFLOW);
+          document.addEventListener(`keydown`, this._handleFormSubmit);
+          document.addEventListener(`keydown`, this._popupEscPressHandler);
+        } else {
+          render(this._bodyElement, this._popupComponent, RenderPosition.BEFOREEND);
+          this._bodyElement.classList.add(TemplateClasses.HIDE_OVERFLOW);
+          document.addEventListener(`keydown`, this._handleFormSubmit);
+          document.addEventListener(`keydown`, this._popupEscPressHandler);
+        }
 
-    // Получается, если код инициации попапа сделать ниже, комментарии еще не получены с сервера, и он некорректно отрабатывает
-    // поэтому я его переместил в api
+      });
   }
 
   _closePopup() {
@@ -145,12 +151,13 @@ export default class Movie {
       }
 
       localComment.date = new Date();
-      this._api.addComment(this._film.id, localComment);
-
-      // this._commentsModel.addComment(
-      //     UserAction.ADD_COMMENT,
-      //     localComment
-      // );
+      this._api.addComment(this._film.id, localComment)
+        .then(
+            (data) => {
+              const newComment = data.comments[data.comments.length - 1];
+              return this._commentsModel.addComment(UserAction.ADD_COMMENT, newComment);
+            }
+        );
     }
   }
 

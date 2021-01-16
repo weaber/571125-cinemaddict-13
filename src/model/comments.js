@@ -15,8 +15,7 @@ export default class Comments extends Observer {
   }
 
   deleteComment(updateType, commentId) {
-    const index = this._comments.findIndex((comment) => comment.id === +commentId);
-
+    const index = this._comments.findIndex((comment) => comment.id === commentId);
     if (index === -1) {
       throw new Error(`Can't delete unexisting comment`);
     }
