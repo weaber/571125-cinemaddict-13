@@ -1,35 +1,27 @@
 import FilmsModel from "./model/movies.js";
 import FiltersModel from "./model/filters.js";
-
 import MenuView from "./view/menu.js";
 import StatsView from "./view/stats.js";
 import FooterStatsView from "./view/footer-statistics.js";
-
 import UserProfilePresenter from "./presenter/user-profile.js";
 import MovieListPresenter from "./presenter/movielist.js";
 import FiltersPresenter from "./presenter/filters.js";
-
-// import {generateFilm} from "./mock/film.js";
-// import {getRandomInt} from "./utils/utils.js";
 import {render, RenderPosition, replace} from "./utils/render.js";
 import {MenuItem, StatPeriodMap, UpdateType} from "./const.js";
-
 import Api from "./api.js";
 
 const AUTHORIZATION = `Basic fdgss;lfdg54655tty`;
 const END_POINT = `https://13.ecmascript.pages.academy/cinemaddict`;
 
-// const FILMS_AMOUNT = getRandomInt(0, 23);
-// const films = new Array(FILMS_AMOUNT).fill().map(generateFilm);
 const api = new Api(END_POINT, AUTHORIZATION);
-// console.log(films);
 const filmsModel = new FilmsModel();
-// filmsModel.setFilms(films);
+
 
 const filtersModel = new FiltersModel();
 
 const siteHeaderElement = document.querySelector(`.header`);
 const siteMainElement = document.querySelector(`.main`);
+const footerStatisitcsElement = document.querySelector(`.footer__statistics`);
 
 const siteMenuComponent = new MenuView();
 render(siteMainElement, siteMenuComponent, RenderPosition.BEFOREEND);
@@ -75,10 +67,10 @@ movieListPresenter.init();
 api.getFilms()
   .then((films) => {
     filmsModel.setFilms(UpdateType.INIT, films);
+    render(footerStatisitcsElement, new FooterStatsView(filmsModel.getFilms()), RenderPosition.BEFOREEND);
   })
   .catch(() => {
     filmsModel.setFilms(UpdateType.INIT, []);
+    render(footerStatisitcsElement, new FooterStatsView(filmsModel.getFilms()), RenderPosition.BEFOREEND);
   });
 
-const footerStatisitcsElement = document.querySelector(`.footer__statistics`);
-render(footerStatisitcsElement, new FooterStatsView(filmsModel.getFilms()), RenderPosition.BEFOREEND);

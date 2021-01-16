@@ -15,8 +15,7 @@ export default class Comments extends Observer {
   }
 
   deleteComment(updateType, commentId) {
-    const index = this._comments.findIndex((comment) => comment.id === +commentId);
-
+    const index = this._comments.findIndex((comment) => comment.id === commentId);
     if (index === -1) {
       throw new Error(`Can't delete unexisting comment`);
     }
@@ -38,7 +37,6 @@ export default class Comments extends Observer {
   }
 
   static adaptToClient(comments) {
-    // console.log(comments);
     const adaptedComment = Object.assign(
         {},
         comments,
@@ -48,18 +46,19 @@ export default class Comments extends Observer {
     );
 
     delete adaptedComment.comment;
-
-    // console.log(adaptedComment);
     return adaptedComment;
   }
 
-  static adaptToServer(comment) {
+  static adaptToServer(comments) {
     const adaptedComment = Object.assign(
         {},
-        comment,
-        {}
+        comments,
+        {
+          comment: comments.text,
+        }
     );
 
+    delete adaptedComment.text;
     return adaptedComment;
   }
 }
