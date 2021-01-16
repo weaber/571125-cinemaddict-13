@@ -255,7 +255,6 @@ export default class Movie {
     const resetPopupState = () => {
       this._popupComponent.updateData({isDisabled: false, deletingCommentId: null});
     };
-
     this._popupComponent.shake(resetPopupState);
   }
 
