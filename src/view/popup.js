@@ -4,11 +4,6 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 
-const BLANK_COMMENT = {
-  text: ``,
-  emotion: ``
-};
-
 const createFilmDetailsInfoTemplate = (data) => {
   const {
     poster,
@@ -119,7 +114,7 @@ const EmotionPicsMap = {
   angry: `./images/emoji/angry.png`
 };
 
-const createCommentTemplate = (comment) => {
+const createCommentTemplate = (comment, isDeleting) => {
   const {id, emotion, author, date, text} = comment;
 
   return `<li class="film-details__comment">
@@ -131,17 +126,23 @@ const createCommentTemplate = (comment) => {
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${author}</span>
           <span class="film-details__comment-day">${dayjs(date).fromNow()}</span>
-          <button class="film-details__comment-delete" data-comment-id="${id}">Delete</button>
+          <button class="film-details__comment-delete" data-comment-id="${id}" ${isDeleting ? `disabled` : ``}>${isDeleting ? `Deleting...` : `Delete`}</button>
         </p>
       </div>
     </li>`;
 };
 
-const createCommentsTemplate = (comments) => {
+const createCommentsTemplate = (comments, deletingCommentId) => {
   const commentListTemplate = comments
     .slice()
     .sort((a, b) => dayjs(a.date).diff(dayjs(b.date)))
-    .map(createCommentTemplate)
+    .map((comment) => {
+      if (deletingCommentId === comment.id) {
+        return createCommentTemplate(comment, true, deletingCommentId);
+      } else {
+        return createCommentTemplate(comment, false, null);
+      }
+    })
     .join(`\n`);
   return commentListTemplate;
 };
@@ -186,12 +187,13 @@ const createNewCommentTemplate = (localComment) => {
 
 const createPopupTemplate = (data, commentsCollection, localComment) => {
   const {
-    comments
+    comments,
+    deletingCommentId
   } = data;
 
   const filmDetailsInfoTemplate = createFilmDetailsInfoTemplate(data);
   const filmDetailsControlsTemplate = createFilmDetailsControlsTemplate(data);
-  const commentsTemplate = createCommentsTemplate(commentsCollection);
+  const commentsTemplate = createCommentsTemplate(commentsCollection, deletingCommentId);
   const newCommentTemplate = createNewCommentTemplate(localComment);
 
   return `<section class="film-details">
@@ -231,7 +233,10 @@ export default class Popup extends SmartView {
     this._data = film;
     this._commentsCollection = commentsCollection;
 
-    this._localComment = BLANK_COMMENT;
+    this._localComment = {
+      text: ``,
+      emotion: ``
+    };
 
     this._closeClickHandler = this._closeClickHandler.bind(this);
 
@@ -309,7 +314,7 @@ export default class Popup extends SmartView {
           emotion: evt.target.value,
         }
     );
-    let currentScrollYPosition = this.getElement().scrollTop;
+    const currentScrollYPosition = this.getElement().scrollTop;
 
     this.updateData(this._localComment);
     this.getElement().scrollTo(0, currentScrollYPosition);

@@ -40,7 +40,6 @@ export default class Movie {
   }
 
   init(film) {
-    // console.log(this._mode);
     this._film = film;
 
     const prevCardComponent = this._cardComponent;
@@ -139,6 +138,10 @@ export default class Movie {
   }
 
   _handleDeleteButtonClick(commentId) {
+    this._popupComponent.updateData({
+      isDeleting: true,
+      deletingCommentId: commentId
+    });
     this._api.deleteComment(commentId)
       .then(() => this._commentsModel.deleteComment(UserAction.DELETE_COMMENT, commentId));
   }
