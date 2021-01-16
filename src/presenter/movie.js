@@ -87,7 +87,7 @@ export default class Movie {
   }
 
   _showPopup() {
-    // this._changeMode();
+    this._changeMode();
     this._mode = Mode.POPUP;
     const prevPopupComponent = this._popupComponent;
 
