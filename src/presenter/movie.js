@@ -89,7 +89,6 @@ export default class Movie {
   _showPopup() {
     // this._changeMode();
     this._mode = Mode.POPUP;
-
     const prevPopupComponent = this._popupComponent;
 
     this._api.getComments(this._film.id)
@@ -106,7 +105,9 @@ export default class Movie {
         this._popupComponent.restoreHandlers();
 
         if (prevPopupComponent !== null && this._bodyElement.contains(prevPopupComponent.getElement())) {
+          const currentScrollYPosition = prevPopupComponent.getElement().scrollTop;
           replace(this._popupComponent, prevPopupComponent);
+          this._popupComponent.getElement().scrollTo(0, currentScrollYPosition);
           this._bodyElement.classList.add(TemplateClasses.HIDE_OVERFLOW);
           document.addEventListener(`keydown`, this._handleFormSubmit);
           document.addEventListener(`keydown`, this._popupEscPressHandler);
