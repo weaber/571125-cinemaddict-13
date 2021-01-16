@@ -61,17 +61,10 @@ export default class Movie {
       replace(this._cardComponent, prevCardComponent);
     }
 
-    // if (this._bodyElement.contains(prevPopupComponent.getElement())) {
-    //   replace(this._popupComponent, prevPopupComponent);
-    // }
-
-    // Типа если был режим попапа, значит удаляем прошлый попап и делаем новый, но у меня экран моргает, видно что перерендеринг
-    // наверное это неправильно
     if (this._mode === Mode.POPUP) {
       this._showPopup();
     }
 
-    // remove(prevPopupComponent);
     remove(prevCardComponent);
   }
 
