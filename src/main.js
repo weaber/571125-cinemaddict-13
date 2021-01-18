@@ -15,8 +15,6 @@ const END_POINT = `https://13.ecmascript.pages.academy/cinemaddict`;
 
 const api = new Api(END_POINT, AUTHORIZATION);
 const filmsModel = new FilmsModel();
-
-
 const filtersModel = new FiltersModel();
 
 const siteHeaderElement = document.querySelector(`.header`);

@@ -43,8 +43,8 @@ export default class Movie {
     this._film = film;
 
     const prevCardComponent = this._cardComponent;
-    this._cardComponent = new FilmCardView(this._film);
 
+    this._cardComponent = new FilmCardView(this._film);
     this._cardComponent.setPosterClickHandler(this._showPopup);
     this._cardComponent.setTitleClickHandler(this._showPopup);
     this._cardComponent.setCommentsClickHandler(this._showPopup);
@@ -80,7 +80,7 @@ export default class Movie {
   }
 
   _showPopup() {
-    this._changeMode();
+    // this._changeMode(); - Делает только один попап, но возвращает моргание
     this._mode = Mode.POPUP;
     const prevPopupComponent = this._popupComponent;
 
@@ -90,7 +90,6 @@ export default class Movie {
 
         this._popupComponent = new PopupView(this._film, this._commentsModel.getComments());
         this._popupComponent.setCloseClickHandler(this._closePopup);
-
         this._popupComponent.setWatchlistClickHandler(this._handleWatchlistClick);
         this._popupComponent.setWatchedClickHandler(this._handleWatchedClick);
         this._popupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
@@ -110,7 +109,6 @@ export default class Movie {
           document.addEventListener(`keydown`, this._handleFormSubmit);
           document.addEventListener(`keydown`, this._popupEscPressHandler);
         }
-
       });
   }
 
@@ -155,9 +153,9 @@ export default class Movie {
         return;
       }
       localComment.date = new Date();
-      this._popupComponent.updateData({
-        isDisabled: true
-      });
+      // this._popupComponent.updateData({
+      //   isDisabled: true
+      // });
       this._api.addComment(this._film.id, localComment)
         .then(
             (data) => {
@@ -252,5 +250,4 @@ export default class Movie {
     };
     this._popupComponent.shake(resetPopupState);
   }
-
 }
