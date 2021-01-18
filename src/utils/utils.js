@@ -43,3 +43,7 @@ export const filter = {
   [FilterType.HISTORY]: (films) => films.filter((film) => film.isWatched),
   [FilterType.FAVORITES]: (films) => films.filter((film) => film.isFavorite),
 };
+
+export const isOnline = () => {
+  return window.navigator.onLine;
+};

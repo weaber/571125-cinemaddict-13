@@ -8,12 +8,19 @@ import MovieListPresenter from "./presenter/movielist.js";
 import FiltersPresenter from "./presenter/filters.js";
 import {render, RenderPosition, replace} from "./utils/render.js";
 import {MenuItem, StatPeriodMap, UpdateType} from "./const.js";
-import Api from ".api/api.js";
+import Api from "./api/api.js";
+import Store from "./api/store.js";
+import Provider from "./api/provider.js";
 
 const AUTHORIZATION = `Basic fdgss;lfdg54655tty`;
 const END_POINT = `https://13.ecmascript.pages.academy/cinemaddict`;
+const STORE_PREFIX = `cinemaddict-localstorage`;
+const STORE_VER = `v13`;
+const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
 
 const api = new Api(END_POINT, AUTHORIZATION);
+const store = new Store(STORE_NAME, window.localStorage);
+const apiWithProvider = new Provider(api, store);
 const filmsModel = new FilmsModel();
 const filtersModel = new FiltersModel();
 
@@ -29,7 +36,7 @@ const siteNavigationElement = siteMainElement.querySelector(`.main-navigation`);
 
 const userProfilePresenter = new UserProfilePresenter(siteHeaderElement, filmsModel);
 const filtersPresenter = new FiltersPresenter(siteNavigationElement, filtersModel, filmsModel);
-const movieListPresenter = new MovieListPresenter(siteMainElement, filmsModel, filtersModel, api);
+const movieListPresenter = new MovieListPresenter(siteMainElement, filmsModel, filtersModel, apiWithProvider);
 
 const handleSiteMenuClick = (menuItem) => {
   if (menuItem !== MenuItem.STATS) {
@@ -62,7 +69,7 @@ userProfilePresenter.init();
 filtersPresenter.init();
 movieListPresenter.init();
 
-api.getFilms()
+apiWithProvider.getFilms()
   .then((films) => {
     filmsModel.setFilms(UpdateType.INIT, films);
     render(footerStatisitcsElement, new FooterStatsView(filmsModel.getFilms()), RenderPosition.BEFOREEND);
@@ -74,4 +81,13 @@ api.getFilms()
 
 window.addEventListener(`load`, () => {
   navigator.serviceWorker.register(`./sw.js`);
+});
+
+window.addEventListener(`online`, () => {
+  document.title = document.title.replace(` [offline]`, ``);
+  apiWithProvider.sync();
+});
+
+window.addEventListener(`offline`, () => {
+  document.title += ` [offline]`;
 });
