@@ -147,7 +147,7 @@ const createCommentsTemplate = (comments, deletingCommentId) => {
   return commentListTemplate;
 };
 
-const createNewCommentTemplate = (localComment) => {
+const createNewCommentTemplate = (isDisabled, localComment) => {
   const {
     text,
     emotion
@@ -158,7 +158,7 @@ const createNewCommentTemplate = (localComment) => {
   return `<div class="film-details__add-emoji-label">${newEmojiPicture}</div>
 
   <label class="film-details__comment-label">
-    <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${text}</textarea>
+    <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment" ${isDisabled ? `disabled` : ``}>${text}</textarea>
   </label>
 
   <div class="film-details__emoji-list">
@@ -188,13 +188,14 @@ const createNewCommentTemplate = (localComment) => {
 const createPopupTemplate = (data, commentsCollection, localComment) => {
   const {
     comments,
-    deletingCommentId
+    deletingCommentId,
+    isDisabled
   } = data;
 
   const filmDetailsInfoTemplate = createFilmDetailsInfoTemplate(data);
   const filmDetailsControlsTemplate = createFilmDetailsControlsTemplate(data);
   const commentsTemplate = createCommentsTemplate(commentsCollection, deletingCommentId);
-  const newCommentTemplate = createNewCommentTemplate(localComment);
+  const newCommentTemplate = createNewCommentTemplate(isDisabled, localComment);
 
   return `<section class="film-details">
     <form class="film-details__inner" action="" method="get">

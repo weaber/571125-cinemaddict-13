@@ -154,8 +154,10 @@ export default class Movie {
         this.setAborting();
         return;
       }
-
       localComment.date = new Date();
+      this._popupComponent.updateData({
+        isDisabled: true
+      });
       this._api.addComment(this._film.id, localComment)
         .then(
             (data) => {
