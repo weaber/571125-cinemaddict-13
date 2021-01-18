@@ -8,7 +8,7 @@ import MovieListPresenter from "./presenter/movielist.js";
 import FiltersPresenter from "./presenter/filters.js";
 import {render, RenderPosition, replace} from "./utils/render.js";
 import {MenuItem, StatPeriodMap, UpdateType} from "./const.js";
-import Api from "./api.js";
+import Api from ".api/api.js";
 
 const AUTHORIZATION = `Basic fdgss;lfdg54655tty`;
 const END_POINT = `https://13.ecmascript.pages.academy/cinemaddict`;
