@@ -142,6 +142,7 @@ export default class Movie {
       isDeleting: true,
       deletingCommentId: commentId
     });
+
     this._api.deleteComment(commentId)
       .then(
           () => {

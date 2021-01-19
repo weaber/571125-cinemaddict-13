@@ -63,7 +63,7 @@ export default class Provider {
 
   deleteComment(commentId) {
     if (isOnline()) {
-      return this._api.addComment(commentId)
+      return this._api.deleteComment(commentId)
         .then(() => this._store.removeItem(commentId));
     }
 
