@@ -15,6 +15,7 @@ self.addEventListener(`install`, (evt) => {
             `./bundle.js`,
             `./css/normalize.css`,
             `./css/main.css`,
+            `./css/toast.css`,
             `./fonts/OpenSans-Bold.woff2`,
             `./fonts/OpenSans-ExtraBold.woff2`,
             `./fonts/OpenSans-Regular.woff2`,
