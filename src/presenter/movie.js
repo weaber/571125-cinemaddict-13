@@ -83,7 +83,9 @@ export default class Movie {
   }
 
   _showPopup() {
-    // this._changeMode(); - Делает только один попап, но возвращает моргание
+    if (this._mode !== Mode.POPUP) {
+      this._changeMode();
+    }
     this._mode = Mode.POPUP;
     const prevPopupComponent = this._popupComponent;
 
