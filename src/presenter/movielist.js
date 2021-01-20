@@ -110,7 +110,7 @@ export default class MovieList {
         this._cardPresenter[data.id].init(data);
         break;
       case UpdateType.MAJOR:
-        this._clearMainContent({resetRenderedFilmsAmount: true, resetSortType: false});
+        this._clearMainContent({resetRenderedFilmsAmount: true, resetSortType: true});
         this._renderMainContent();
         break;
       case UpdateType.INIT:

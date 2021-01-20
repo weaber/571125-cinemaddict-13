@@ -1,5 +1,4 @@
 import FilmsModel from "../model/movies.js";
-import CommentsModel from "../model/comments.js";
 import {toast} from "../utils/toast.js";
 
 const getSyncedFilms = (items) => {
@@ -19,10 +18,15 @@ export default class Provider {
   constructor(api, store) {
     this._api = api;
     this._store = store;
+    this._isSyncRequired = false;
   }
 
   _isOnline() {
     return window.navigator.onLine;
+  }
+
+  isSyncRequired() {
+    return this._isSyncRequired;
   }
 
   getFilms() {
@@ -41,25 +45,16 @@ export default class Provider {
 
   getComments(filmId) {
     if (this._isOnline()) {
-      return this._api.getComments(filmId)
-      .then((comments) => {
-        const items = createStoreStructure(comments.map(CommentsModel.adaptToServer));
-        this._store.setItems(items);
-        return comments;
-      });
+      return this._api.getComments(filmId);
     }
 
-    const storeComments = Object.values(this._store.getItems());
-    return Promise.resolve(storeComments.map(CommentsModel.adaptToClient));
+    toast(`You can't get comments offline`);
+    return Promise.resolve([]);
   }
 
   addComment(filmId, comment) {
     if (this._isOnline()) {
-      return this._api.addComment(filmId, comment)
-        .then((newComment) => {
-          this._store.setItem(newComment.id, CommentsModel.adaptToServer(newComment));
-          return newComment;
-        });
+      return this._api.addComment(filmId, comment);
     }
 
     toast(`You can't add comment offline`);
@@ -68,8 +63,7 @@ export default class Provider {
 
   deleteComment(commentId) {
     if (this._isOnline()) {
-      return this._api.deleteComment(commentId)
-        .then(() => this._store.removeItem(commentId));
+      return this._api.deleteComment(commentId);
     }
 
     toast(`You can't delete comment offline`);
@@ -86,7 +80,7 @@ export default class Provider {
     }
 
     this._store.setItem(film.id, FilmsModel.adaptToServer(Object.assign({}, film)));
-
+    this._isSyncRequired = true;
     return Promise.resolve(film);
   }
 
@@ -96,15 +90,10 @@ export default class Provider {
 
       return this._api.sync(storeFilms)
         .then((response) => {
-          // Забираем из ответа синхронизированные задачи
-          const createdFilms = getSyncedFilms(response.created);
           const updatedFilms = getSyncedFilms(response.updated);
-
-          // Добавляем синхронизированные задачи в хранилище.
-          // Хранилище должно быть актуальным в любой момент.
-          const items = createStoreStructure([...createdFilms, ...updatedFilms]);
-
+          const items = createStoreStructure([...updatedFilms]);
           this._store.setItems(items);
+          this._isSyncRequired = false;
         });
     }
 

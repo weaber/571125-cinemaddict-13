@@ -84,7 +84,6 @@ export default class Api {
     )
       .then(Api.checkStatus)
       .catch(Api.catchError);
-
   }
 
   static checkStatus(response) {
@@ -94,9 +93,7 @@ export default class Api {
     ) {
       throw new Error(`${response.status}: ${response.statusText}`);
     }
-
     return response;
-
   }
 
   static toJSON(response) {

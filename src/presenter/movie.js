@@ -29,14 +29,12 @@ export default class Movie {
     this._handleWatchlistClick = this._handleWatchlistClick.bind(this);
     this._handleWatchedClick = this._handleWatchedClick.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
-
     this._handleDeleteButtonClick = this._handleDeleteButtonClick.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
+    this._handleFormSubmit = this._handleFormSubmit.bind(this);
 
     this._commentsModel = new CommentsModel();
     this._commentsModel.addObserver(this._handleModelEvent);
-
-    this._handleFormSubmit = this._handleFormSubmit.bind(this);
   }
 
   init(film) {
