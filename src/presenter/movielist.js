@@ -10,7 +10,7 @@ import ShowMoreButtonView from "../view/showmore-button.js";
 import MovieCardPresenter from "./movie.js";
 import {render, RenderPosition, remove} from "../utils/render.js";
 import {SortType, UserAction, UpdateType, TemplateClasses} from "../const.js";
-import {filter, sortByDate, sortByRating} from "../utils/utils.js";
+import {filter, sortByDate, sortByRating, sortByComments} from "../utils/utils.js";
 
 const FILMS_AMOUNT_PER_STEP = 5;
 
@@ -198,26 +198,39 @@ export default class MovieList {
 
   _renderTopRated() {
     const MAX_TOPRATED_CARD_AMOUNT = 2;
-    let topratedCardAmount = Math.min(MAX_TOPRATED_CARD_AMOUNT, this._films.length);
+    const topratedCardAmount = Math.min(MAX_TOPRATED_CARD_AMOUNT, this._films.length);
+    const sortedTopRated = this._filmsModel.getFilms().sort(sortByRating);
+
+    if (sortedTopRated.length === 0) {
+      return;
+    }
 
     render(this._filmsComponent, this._topRatedComponent, RenderPosition.BEFOREEND);
     render(this._topRatedComponent, this._topRatedFilmsListComponent, RenderPosition.BEFOREEND);
 
     for (let i = 0; i < topratedCardAmount; i++) {
       const TopRatedPresenter = new MovieCardPresenter(this._topRatedFilmsListComponent);
-      TopRatedPresenter.init(this._films[i]);
+      TopRatedPresenter.init(this._sortedTopRAted[i]);
     }
   }
 
   _renderMostCommented() {
     const MAX_MOSTCOMMENTED_CARD_AMOUNT = 2;
-    let mostCommentedCardAmount = Math.min(MAX_MOSTCOMMENTED_CARD_AMOUNT, this._films.length);
+
+    const sortedMostCommented = this._filmsModel.getFilms().sort(sortByComments);
+    const mostCommentedCardAmount = Math.min(MAX_MOSTCOMMENTED_CARD_AMOUNT, sortedMostCommented.length);
+
+
+    if (sortedMostCommented.length === 0) {
+      return;
+    }
+
     render(this._filmsComponent, this._mostCommentedComponent, RenderPosition.BEFOREEND);
     render(this._mostCommentedComponent, this._mostCommentedFilmsListComponent, RenderPosition.BEFOREEND);
 
     for (let i = 0; i < mostCommentedCardAmount; i++) {
-      const MostCommentedPresenter = new MovieCardPresenter(this._mostCommentedFilmsListComponent);
-      MostCommentedPresenter.init(this._films[i]);
+      const MostCommentedPresenter = new MovieCardPresenter(this._mostCommentedFilmsListComponent, this._handleViewAction, this._handleModeChange, this._api);
+      MostCommentedPresenter.init(sortedMostCommented[i]);
     }
   }
 
@@ -250,5 +263,6 @@ export default class MovieList {
 
     // this._renderTopRated();
     // this._renderMostCommented();
+
   }
 }

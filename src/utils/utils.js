@@ -30,11 +30,15 @@ export const sortByDate = (filmA, filmB) => {
     return weight;
   }
 
-  return dayjs(filmA.filmDate).diff(dayjs(filmB.filmDate));
+  return dayjs(filmB.filmDate).diff(dayjs(filmA.filmDate));
 };
 
 export const sortByRating = (filmA, filmB) => {
-  return filmA.rating - filmB.rating;
+  return filmB.rating - filmA.rating;
+};
+
+export const sortByComments = (filmA, filmB) => {
+  return filmB.comments.length - filmA.comments.length;
 };
 
 export const filter = {
@@ -42,8 +46,4 @@ export const filter = {
   [FilterType.WATCHLIST]: (films) => films.filter((film) => film.isWatchlist),
   [FilterType.HISTORY]: (films) => films.filter((film) => film.isWatched),
   [FilterType.FAVORITES]: (films) => films.filter((film) => film.isFavorite),
-};
-
-export const isOnline = () => {
-  return window.navigator.onLine;
 };

@@ -1,6 +1,6 @@
 import FilmsModel from "../model/movies.js";
 import CommentsModel from "../model/comments.js";
-import {isOnline} from "../utils/utils.js";
+import {toast} from "../utils/toast.js";
 
 const getSyncedFilms = (items) => {
   return items.filter(({success}) => success)
@@ -21,8 +21,12 @@ export default class Provider {
     this._store = store;
   }
 
+  _isOnline() {
+    return window.navigator.onLine;
+  }
+
   getFilms() {
-    if (isOnline()) {
+    if (this._isOnline()) {
       return this._api.getFilms()
         .then((films) => {
           const items = createStoreStructure(films.map(FilmsModel.adaptToServer));
@@ -36,13 +40,13 @@ export default class Provider {
   }
 
   getComments(filmId) {
-    if (isOnline()) {
+    if (this._isOnline()) {
       return this._api.getComments(filmId)
-        .then((comments) => {
-          const items = createStoreStructure(comments.map(CommentsModel.adaptToServer));
-          this._store.setItems(items);
-          return comments;
-        });
+      .then((comments) => {
+        const items = createStoreStructure(comments.map(CommentsModel.adaptToServer));
+        this._store.setItems(items);
+        return comments;
+      });
     }
 
     const storeComments = Object.values(this._store.getItems());
@@ -50,7 +54,7 @@ export default class Provider {
   }
 
   addComment(filmId, comment) {
-    if (isOnline()) {
+    if (this._isOnline()) {
       return this._api.addComment(filmId, comment)
         .then((newComment) => {
           this._store.setItem(newComment.id, CommentsModel.adaptToServer(newComment));
@@ -58,20 +62,22 @@ export default class Provider {
         });
     }
 
+    toast(`You can't add comment offline`);
     return Promise.reject(new Error(`Add comment failed`));
   }
 
   deleteComment(commentId) {
-    if (isOnline()) {
+    if (this._isOnline()) {
       return this._api.deleteComment(commentId)
         .then(() => this._store.removeItem(commentId));
     }
 
+    toast(`You can't delete comment offline`);
     return Promise.reject(new Error(`Delete comment failed`));
   }
 
   updateFilm(film) {
-    if (isOnline()) {
+    if (this._isOnline()) {
       return this._api.updateFilm(film)
         .then((updatedFilm) => {
           this._store.setItem(updatedFilm.id, FilmsModel.adaptToServer(updatedFilm));
@@ -85,7 +91,7 @@ export default class Provider {
   }
 
   sync() {
-    if (isOnline()) {
+    if (this._isOnline()) {
       const storeFilms = Object.values(this._store.getItems());
 
       return this._api.sync(storeFilms)

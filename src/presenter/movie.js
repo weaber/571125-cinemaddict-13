@@ -4,9 +4,6 @@ import {remove, render, RenderPosition, replace} from "../utils/render.js";
 import {UserAction, UpdateType, TemplateClasses} from "../const.js";
 import CommentsModel from "../model/comments.js";
 
-import {isOnline} from "../utils/utils.js";
-import {toast} from "../utils/toast/toast.js";
-
 const Mode = {
   DEFAULT: `DEFAULT`,
   POPUP: `POPUP`
@@ -135,11 +132,6 @@ export default class Movie {
   }
 
   _handleDeleteButtonClick(commentId) {
-    if (!isOnline()) {
-      toast(`You can't delete comment offline`);
-      return;
-    }
-
     this._popupComponent.updateData({
       isDeleting: true,
       deletingCommentId: commentId
@@ -158,10 +150,6 @@ export default class Movie {
 
   _handleFormSubmit(evt) {
     if (evt.ctrlKey && evt.key === `Enter`) {
-      if (!isOnline()) {
-        toast(`You can't add comment offline`);
-        return;
-      }
       const localComment = this._popupComponent.getNewComment();
       if (localComment.emotion === `` || localComment.text === ``) {
         this.setAborting();
