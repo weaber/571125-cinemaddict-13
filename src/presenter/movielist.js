@@ -4,8 +4,6 @@ import MainFilmsListContentView from "../view/main-films-list.js";
 import LoadingView from "../view/loading.js";
 import NoFilmsView from "../view/no-films.js";
 import FilmsListView from "../view/films-list-container.js";
-import TopRatedView from "../view/toprated.js";
-import MostCommentedView from "../view/mostcommented.js";
 import ShowMoreButtonView from "../view/showmore-button.js";
 import MovieCardPresenter from "./movie.js";
 import {render, RenderPosition, remove} from "../utils/render.js";
@@ -39,13 +37,6 @@ export default class MovieList {
 
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
-
-    this._topRatedComponent = new TopRatedView();
-    this._topRatedFilmsListComponent = new FilmsListView();
-
-    this._mostCommentedComponent = new MostCommentedView();
-    this._mostCommentedFilmsListComponent = new FilmsListView();
-
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
 
@@ -110,7 +101,7 @@ export default class MovieList {
         this._cardPresenter[data.id].init(data);
         break;
       case UpdateType.MAJOR:
-        this._clearMainContent({resetRenderedFilmsAmount: true, resetSortType: false});
+        this._clearMainContent({resetRenderedFilmsAmount: true, resetSortType: true});
         this._renderMainContent();
         break;
       case UpdateType.INIT:
@@ -196,31 +187,6 @@ export default class MovieList {
     render(this._filmsComponent, this._noFilmsComponent, RenderPosition.BEFOREEND);
   }
 
-  _renderTopRated() {
-    const MAX_TOPRATED_CARD_AMOUNT = 2;
-    let topratedCardAmount = Math.min(MAX_TOPRATED_CARD_AMOUNT, this._films.length);
-
-    render(this._filmsComponent, this._topRatedComponent, RenderPosition.BEFOREEND);
-    render(this._topRatedComponent, this._topRatedFilmsListComponent, RenderPosition.BEFOREEND);
-
-    for (let i = 0; i < topratedCardAmount; i++) {
-      const TopRatedPresenter = new MovieCardPresenter(this._topRatedFilmsListComponent);
-      TopRatedPresenter.init(this._films[i]);
-    }
-  }
-
-  _renderMostCommented() {
-    const MAX_MOSTCOMMENTED_CARD_AMOUNT = 2;
-    let mostCommentedCardAmount = Math.min(MAX_MOSTCOMMENTED_CARD_AMOUNT, this._films.length);
-    render(this._filmsComponent, this._mostCommentedComponent, RenderPosition.BEFOREEND);
-    render(this._mostCommentedComponent, this._mostCommentedFilmsListComponent, RenderPosition.BEFOREEND);
-
-    for (let i = 0; i < mostCommentedCardAmount; i++) {
-      const MostCommentedPresenter = new MovieCardPresenter(this._mostCommentedFilmsListComponent);
-      MostCommentedPresenter.init(this._films[i]);
-    }
-  }
-
   _renderMainContent() {
     if (this._isLoading) {
       this._renderLoading();
@@ -247,8 +213,5 @@ export default class MovieList {
     if (filmsAmount > this._renderedFilmsAmount) {
       this._renderShowMoreButton();
     }
-
-    // this._renderTopRated();
-    // this._renderMostCommented();
   }
 }

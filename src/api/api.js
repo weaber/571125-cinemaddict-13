@@ -1,5 +1,5 @@
-import FilmsModel from "./model/movies.js";
-import CommentsModel from "./model/comments.js";
+import FilmsModel from "../model/movies.js";
+import CommentsModel from "../model/comments.js";
 
 const Method = {
   GET: `GET`,
@@ -60,6 +60,16 @@ export default class Api {
     .then(FilmsModel.adaptToClient);
   }
 
+  sync(data) {
+    return this._load({
+      url: `movies/sync`,
+      method: Method.POST,
+      body: JSON.stringify(data),
+      headers: new Headers({"Content-Type": `application/json`})
+    })
+      .then(Api.toJSON);
+  }
+
   _load({
     url,
     method = Method.GET,
@@ -74,7 +84,6 @@ export default class Api {
     )
       .then(Api.checkStatus)
       .catch(Api.catchError);
-
   }
 
   static checkStatus(response) {
@@ -84,9 +93,7 @@ export default class Api {
     ) {
       throw new Error(`${response.status}: ${response.statusText}`);
     }
-
     return response;
-
   }
 
   static toJSON(response) {

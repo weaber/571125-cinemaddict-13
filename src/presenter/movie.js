@@ -29,22 +29,20 @@ export default class Movie {
     this._handleWatchlistClick = this._handleWatchlistClick.bind(this);
     this._handleWatchedClick = this._handleWatchedClick.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
-
     this._handleDeleteButtonClick = this._handleDeleteButtonClick.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
+    this._handleFormSubmit = this._handleFormSubmit.bind(this);
 
     this._commentsModel = new CommentsModel();
     this._commentsModel.addObserver(this._handleModelEvent);
-
-    this._handleFormSubmit = this._handleFormSubmit.bind(this);
   }
 
   init(film) {
     this._film = film;
 
     const prevCardComponent = this._cardComponent;
-    this._cardComponent = new FilmCardView(this._film);
 
+    this._cardComponent = new FilmCardView(this._film);
     this._cardComponent.setPosterClickHandler(this._showPopup);
     this._cardComponent.setTitleClickHandler(this._showPopup);
     this._cardComponent.setCommentsClickHandler(this._showPopup);
@@ -61,17 +59,10 @@ export default class Movie {
       replace(this._cardComponent, prevCardComponent);
     }
 
-    // if (this._bodyElement.contains(prevPopupComponent.getElement())) {
-    //   replace(this._popupComponent, prevPopupComponent);
-    // }
-
-    // Типа если был режим попапа, значит удаляем прошлый попап и делаем новый, но у меня экран моргает, видно что перерендеринг
-    // наверное это неправильно
     if (this._mode === Mode.POPUP) {
       this._showPopup();
     }
 
-    // remove(prevPopupComponent);
     remove(prevCardComponent);
   }
 
@@ -87,7 +78,9 @@ export default class Movie {
   }
 
   _showPopup() {
-    // this._changeMode();
+    if (this._mode !== Mode.POPUP) {
+      this._changeMode();
+    }
     this._mode = Mode.POPUP;
     const prevPopupComponent = this._popupComponent;
 
@@ -97,7 +90,6 @@ export default class Movie {
 
         this._popupComponent = new PopupView(this._film, this._commentsModel.getComments());
         this._popupComponent.setCloseClickHandler(this._closePopup);
-
         this._popupComponent.setWatchlistClickHandler(this._handleWatchlistClick);
         this._popupComponent.setWatchedClickHandler(this._handleWatchedClick);
         this._popupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
@@ -117,7 +109,6 @@ export default class Movie {
           document.addEventListener(`keydown`, this._handleFormSubmit);
           document.addEventListener(`keydown`, this._popupEscPressHandler);
         }
-
       });
   }
 
@@ -143,6 +134,7 @@ export default class Movie {
       isDeleting: true,
       deletingCommentId: commentId
     });
+
     this._api.deleteComment(commentId)
       .then(
           () => {
@@ -161,8 +153,10 @@ export default class Movie {
         this.setAborting();
         return;
       }
-
       localComment.date = new Date();
+      this._popupComponent.updateData({
+        isDisabled: true
+      });
       this._api.addComment(this._film.id, localComment)
         .then(
             (data) => {
@@ -255,8 +249,6 @@ export default class Movie {
     const resetPopupState = () => {
       this._popupComponent.updateData({isDisabled: false, deletingCommentId: null});
     };
-
     this._popupComponent.shake(resetPopupState);
   }
-
 }
