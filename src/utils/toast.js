@@ -1,5 +1,3 @@
-// import "./toast.css";
-
 const SHOW_TIME = 5000;
 
 const toastContainer = document.createElement(`div`);
