@@ -45,7 +45,7 @@ const handleSiteMenuClick = (menuItem) => {
     return;
   }
 
-  let prevStatsComponent = statsComponent;
+  const prevStatsComponent = statsComponent;
   const watchedFilms = filmsModel.getFilms().filter((film) => film.isWatched);
   const currentUserTitle = userProfilePresenter.getCurrentUserTitle();
   statsComponent = new StatsView(watchedFilms, StatPeriodMap.ALL_TIME, currentUserTitle);
