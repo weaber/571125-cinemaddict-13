@@ -1,6 +1,6 @@
 import SortView from "../view/sort.js";
 import FilmsContentView from "../view/films-content.js";
-import MainFilmsListContentView from "../view/main-films-list.js";
+import MainFilmsListView from "../view/main-films-list.js";
 import LoadingView from "../view/loading.js";
 import NoFilmsView from "../view/no-films.js";
 import FilmsListView from "../view/films-list.js";
@@ -28,7 +28,7 @@ export default class MovieList {
     this._isLoading = true;
 
     this._filmsComponent = new FilmsContentView();
-    this._mainFilmsListComponent = new MainFilmsListContentView();
+    this._mainFilmsListComponent = new MainFilmsListView();
     this._filmsListComponent = new FilmsListView();
     this._noFilmsComponent = new NoFilmsView();
     this._loadingComponent = new LoadingView();
