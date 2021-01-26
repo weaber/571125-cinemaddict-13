@@ -1,12 +1,6 @@
 import dayjs from "dayjs";
 import {FilterType} from "../const.js";
 
-export const getRandomInt = (a = 1, b = 0) => {
-  const lower = Math.ceil(Math.min(a, b));
-  const upper = Math.floor(Math.max(a, b));
-  return Math.floor(lower + Math.random() * (upper - lower + 1));
-};
-
 const getWeightForNullDate = (filmA, filmB) => {
   if (filmA === null && filmB === null) {
     return 0;
@@ -35,10 +29,6 @@ export const sortByDate = (filmA, filmB) => {
 
 export const sortByRating = (filmA, filmB) => {
   return filmB.rating - filmA.rating;
-};
-
-export const sortByComments = (filmA, filmB) => {
-  return filmB.comments.length - filmA.comments.length;
 };
 
 export const filter = {

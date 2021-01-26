@@ -1,10 +1,10 @@
-import FilmsModel from "./model/movies.js";
+import FilmsModel from "./model/films.js";
 import FiltersModel from "./model/filters.js";
 import MenuView from "./view/menu.js";
 import StatsView from "./view/stats.js";
-import FooterStatsView from "./view/footer-statistics.js";
+import FooterStatsView from "./view/footer-stats.js";
 import UserProfilePresenter from "./presenter/user-profile.js";
-import MovieListPresenter from "./presenter/movielist.js";
+import MovieListPresenter from "./presenter/movie-list.js";
 import FiltersPresenter from "./presenter/filters.js";
 import {render, RenderPosition, replace} from "./utils/render.js";
 import {MenuItem, StatPeriodMap, UpdateType} from "./const.js";

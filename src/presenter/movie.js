@@ -25,13 +25,13 @@ export default class Movie {
     this._showPopup = this._showPopup.bind(this);
     this._closePopup = this._closePopup.bind(this);
     this._popupEscPressHandler = this._popupEscPressHandler.bind(this);
+    this._formSubmitHandler = this._formSubmitHandler.bind(this);
 
     this._handleWatchlistClick = this._handleWatchlistClick.bind(this);
     this._handleWatchedClick = this._handleWatchedClick.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleDeleteButtonClick = this._handleDeleteButtonClick.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
-    this._handleFormSubmit = this._handleFormSubmit.bind(this);
 
     this._commentsModel = new CommentsModel();
     this._commentsModel.addObserver(this._handleModelEvent);
@@ -101,12 +101,12 @@ export default class Movie {
           replace(this._popupComponent, prevPopupComponent);
           this._popupComponent.getElement().scrollTo(0, currentScrollYPosition);
           this._bodyElement.classList.add(TemplateClasses.HIDE_OVERFLOW);
-          document.addEventListener(`keydown`, this._handleFormSubmit);
+          document.addEventListener(`keydown`, this._formSubmitHandler);
           document.addEventListener(`keydown`, this._popupEscPressHandler);
         } else {
           render(this._bodyElement, this._popupComponent, RenderPosition.BEFOREEND);
           this._bodyElement.classList.add(TemplateClasses.HIDE_OVERFLOW);
-          document.addEventListener(`keydown`, this._handleFormSubmit);
+          document.addEventListener(`keydown`, this._formSubmitHandler);
           document.addEventListener(`keydown`, this._popupEscPressHandler);
         }
       });
@@ -117,7 +117,7 @@ export default class Movie {
     remove(this._popupComponent);
     this._bodyElement.classList.remove(TemplateClasses.HIDE_OVERFLOW);
     document.removeEventListener(`keydown`, this._popupEscPressHandler);
-    document.removeEventListener(`keydown`, this._handleFormSubmit);
+    document.removeEventListener(`keydown`, this._formSubmitHandler);
   }
 
   _popupEscPressHandler(evt) {
@@ -125,7 +125,7 @@ export default class Movie {
       evt.preventDefault();
       this._closePopup();
       document.removeEventListener(`keydown`, this._popupEscPressHandler);
-      document.removeEventListener(`keydown`, this._handleFormSubmit);
+      document.removeEventListener(`keydown`, this._formSubmitHandler);
     }
   }
 
@@ -146,7 +146,7 @@ export default class Movie {
       });
   }
 
-  _handleFormSubmit(evt) {
+  _formSubmitHandler(evt) {
     if (evt.ctrlKey && evt.key === `Enter`) {
       const localComment = this._popupComponent.getNewComment();
       if (localComment.emotion === `` || localComment.text === ``) {
