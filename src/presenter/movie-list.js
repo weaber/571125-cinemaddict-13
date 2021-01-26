@@ -1,10 +1,10 @@
 import SortView from "../view/sort.js";
-import FilmsContentView from "../view/films-content-container.js";
+import FilmsContentView from "../view/films-content.js";
 import MainFilmsListContentView from "../view/main-films-list.js";
 import LoadingView from "../view/loading.js";
 import NoFilmsView from "../view/no-films.js";
-import FilmsListView from "../view/films-list-container.js";
-import ShowMoreButtonView from "../view/showmore-button.js";
+import FilmsListView from "../view/films-list.js";
+import ShowMoreButtonView from "../view/show-more-button.js";
 import MovieCardPresenter from "./movie.js";
 import {render, RenderPosition, remove} from "../utils/render.js";
 import {SortType, UserAction, UpdateType, TemplateClasses} from "../const.js";

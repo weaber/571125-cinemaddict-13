@@ -7,7 +7,7 @@ const createTopratedTemplate = () => {
   `;
 };
 
-export default class Toprated extends AbstractView {
+export default class TopRated extends AbstractView {
   getTemplate() {
     return createTopratedTemplate();
   }

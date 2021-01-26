@@ -31,15 +31,15 @@ export default class UserProfile {
 
   _getUserTitle() {
     const watchedFilmsAmount = this._filmsModel.getFilms().filter((film) => film.isWatched).length;
-    if (watchedFilmsAmount === 0) {
-      return ``;
-    } else if (watchedFilmsAmount >= 21) {
+
+    if (watchedFilmsAmount > 20) {
       return UserTitleMap.MOVIE_BUFF;
-    } else if (watchedFilmsAmount >= 10) {
+    } else if (watchedFilmsAmount > 10) {
       return UserTitleMap.FAN;
-    } else {
+    } else if (watchedFilmsAmount > 0) {
       return UserTitleMap.NOVICE;
     }
+    return ``;
   }
 
   _handleModelEvent() {

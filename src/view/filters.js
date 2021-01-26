@@ -19,7 +19,7 @@ const createNavigationTemplate = (filterItems, currentFilterType) => {
        </div>`;
 };
 
-export default class Filter extends AbstractView {
+export default class Filters extends AbstractView {
   constructor(filters, currentFilterType) {
     super();
     this._filters = filters;
