@@ -25,7 +25,11 @@ export default class MovieList {
     this._mainContainer = mainContainer;
     this._renderedFilmsAmount = FILMS_AMOUNT_PER_STEP;
 
-    this._cardPresenter = {};
+    this._cardPresenter = {
+      mainList: {},
+      topRatedList: {},
+      mostCommentedList: {}
+    };
     this._currentSortType = SortType.DEFAULT;
     this._isLoading = true;
 
@@ -84,12 +88,12 @@ export default class MovieList {
   _renderCard(film) {
     const cardPresenter = new MovieCardPresenter(this._filmsListComponent, this._handleViewAction, this._handleModeChange, this._api);
     cardPresenter.init(film);
-    this._cardPresenter[film.id] = cardPresenter;
+    this._cardPresenter.mainList[film.id] = cardPresenter;
   }
 
   _handleModeChange() {
     Object
-      .values(this._cardPresenter)
+      .values(this._cardPresenter.mainList)
       .forEach((presenter) => presenter.resetView());
   }
 
@@ -106,7 +110,7 @@ export default class MovieList {
   _handleModelEvent(updateType, data) {
     switch (updateType) {
       case UpdateType.PATCH:
-        this._cardPresenter[data.id].init(data);
+        this._cardPresenter.mainList[data.id].init(data);
         break;
       case UpdateType.MAJOR:
         this._clearMainContent({resetRenderedFilmsAmount: true, resetSortType: true});
@@ -128,10 +132,14 @@ export default class MovieList {
 
   _clearMainContent({resetRenderedFilmsAmount = false, resetSortType = false} = {}) {
     Object
-      .values(this._cardPresenter)
+      .values(this._cardPresenter.mainList)
       .forEach((presenter) => presenter.destroy());
 
-    this._cardPresenter = {};
+    this._cardPresenter = {
+      mainList: {},
+      topRatedList: {},
+      mostCommentedList: {}
+    };
     remove(this._noFilmsComponent);
     remove(this._sortComponent);
     remove(this._loadingComponent);
@@ -254,7 +262,7 @@ export default class MovieList {
       this._renderShowMoreButton();
     }
 
-    this._renderTopRated();
-    this._renderMostCommented();
+    // this._renderTopRated();
+    // this._renderMostCommented();
   }
 }
