@@ -85,10 +85,10 @@ export default class MovieList {
     this._filmsComponent.getElement().classList.remove(`visually-hidden`);
   }
 
-  _renderCard(film) {
-    const cardPresenter = new MovieCardPresenter(this._filmsListComponent, this._handleViewAction, this._handleModeChange, this._api);
+  _renderCard(film, container, cardPresenterList) {
+    const cardPresenter = new MovieCardPresenter(container, this._handleViewAction, this._handleModeChange, this._api);
     cardPresenter.init(film);
-    this._cardPresenter.mainList[film.id] = cardPresenter;
+    cardPresenterList[film.id] = cardPresenter;
   }
 
   _handleModeChange() {
@@ -110,7 +110,20 @@ export default class MovieList {
   _handleModelEvent(updateType, data) {
     switch (updateType) {
       case UpdateType.PATCH:
-        this._cardPresenter.mainList[data.id].init(data);
+        // Обновляем доску
+        if (this._cardPresenter.mainList[data.id]) {
+          this._cardPresenter.mainList[data.id].init(data);
+        }
+        // Тут нужно просто обновить topRated
+        if (this._cardPresenter.topRatedList[data.id]) {
+          this._cardPresenter.topRatedList[data.id].init(data);
+        }
+        // Тут нужно будет и обновить (клик по Watchlist etc) и перерисовать (если изменилось количество комментариев) mostCommented
+        if (this._cardPresenter.mostCommentedList[data.id]) {
+          this._cardPresenter.mostCommentedList[data.id].init(data);
+          break;
+        }
+        // И тут проблема, если меняется количество комментариев и составл блока, тогда надо перерисовать блок, но оставить попап.
         break;
       case UpdateType.MAJOR:
         this._clearMainContent({resetRenderedFilmsAmount: true, resetSortType: true});
@@ -154,8 +167,8 @@ export default class MovieList {
     }
   }
 
-  _renderCards(films) {
-    films.forEach((film) => this._renderCard(film));
+  _renderCards(films, container, cardPresenterList) {
+    films.forEach((film) => this._renderCard(film, container, cardPresenterList));
   }
 
   _handleShowMoreButtonClick() {
@@ -163,7 +176,7 @@ export default class MovieList {
     const newRenderedFilmsAmount = Math.min(filmsAmount, this._renderedFilmsAmount + FILMS_AMOUNT_PER_STEP);
     const films = this._getFilms().slice(this._renderedFilmsAmount, newRenderedFilmsAmount);
 
-    this._renderCards(films);
+    this._renderCards(films, this._filmsListComponent, this._cardPresenter.mainList);
     this._renderedFilmsAmount = newRenderedFilmsAmount;
 
     if (this._renderedFilmsAmount >= filmsAmount) {
@@ -204,35 +217,37 @@ export default class MovieList {
   }
 
   _renderTopRated() {
-    // Определим длину сколько карточек рендерить
     const MAX_TOPRATED_CARD_AMOUNT = 2;
+    const films = this._getFilms();
+
+    if (films.every((film) => film.rating === 0)) {
+      return;
+    }
+
     const topRatedCardAmount = Math.min(MAX_TOPRATED_CARD_AMOUNT, this._filmsModel.getFilms().length);
-    const topRatedFilms = this._filmsModel.getFilms().sort(sortByRating).slice(0, topRatedCardAmount);
-    // Проверки на 0 и одинаковость
-    // Рендерим контейнер
+    const topRatedFilms = films.sort(sortByRating).slice(0, topRatedCardAmount);
+
     render(this._filmsComponent, this._topRatedComponent, RenderPosition.BEFOREEND);
     render(this._topRatedComponent, this._topRatedFilmsListComponent, RenderPosition.BEFOREEND);
 
-    // Обработчики???
-    topRatedFilms.forEach((film) => {
-      const TopRatedPresenter = new MovieCardPresenter(this._topRatedFilmsListComponent, this._handleViewAction, this._handleModeChange, this._api);
-      TopRatedPresenter.init(film);
-    });
-
+    this._renderCards(topRatedFilms, this._topRatedFilmsListComponent, this._cardPresenter.topRatedList);
   }
 
   _renderMostCommented() {
     const MAX_MOSTCOMMENTED_CARD_AMOUNT = 2;
+    const films = this._getFilms();
+
+    if (films.every((film) => film.comments === 0)) {
+      return;
+    }
+
     const mostCommentedCardAmount = Math.min(MAX_MOSTCOMMENTED_CARD_AMOUNT, this._filmsModel.getFilms().length);
-    const mostCommentedFilms = this._filmsModel.getFilms().sort(sortByComments).slice(0, mostCommentedCardAmount);
+    const mostCommentedFilms = films.sort(sortByComments).slice(0, mostCommentedCardAmount);
 
     render(this._filmsComponent, this._mostCommentedComponent, RenderPosition.BEFOREEND);
     render(this._mostCommentedComponent, this._mostCommentedFilmsListComponent, RenderPosition.BEFOREEND);
 
-    mostCommentedFilms.forEach((film) => {
-      const MostCommentedPresenter = new MovieCardPresenter(this._mostCommentedFilmsListComponent, this._handleViewAction);
-      MostCommentedPresenter.init(film);
-    });
+    this._renderCards(mostCommentedFilms, this._mostCommentedFilmsListComponent, this._cardPresenter.mostCommentedList);
   }
 
   _renderMainContent() {
@@ -256,13 +271,13 @@ export default class MovieList {
     render(this._filmsComponent, this._mainFilmsListComponent, RenderPosition.BEFOREEND);
     render(this._mainFilmsListComponent, this._filmsListComponent, RenderPosition.BEFOREEND);
 
-    this._renderCards(films.slice(0, Math.min(filmsAmount, this._renderedFilmsAmount)));
+    this._renderCards(films.slice(0, Math.min(filmsAmount, this._renderedFilmsAmount)), this._filmsListComponent, this._cardPresenter.mainList);
 
     if (filmsAmount > this._renderedFilmsAmount) {
       this._renderShowMoreButton();
     }
 
-    // this._renderTopRated();
-    // this._renderMostCommented();
+    this._renderTopRated();
+    this._renderMostCommented();
   }
 }
