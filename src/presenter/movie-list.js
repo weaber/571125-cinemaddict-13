@@ -4,11 +4,13 @@ import MainFilmsListView from "../view/main-films-list.js";
 import LoadingView from "../view/loading.js";
 import NoFilmsView from "../view/no-films.js";
 import FilmsListView from "../view/films-list.js";
+import TopRatedView from "../view/top-rated.js";
+import MostCommentedView from "../view/most-commented.js";
 import ShowMoreButtonView from "../view/show-more-button.js";
 import MovieCardPresenter from "./movie.js";
 import {render, RenderPosition, remove} from "../utils/render.js";
 import {SortType, UserAction, UpdateType, TemplateClasses} from "../const.js";
-import {filter, sortByDate, sortByRating} from "../utils/utils.js";
+import {filter, sortByDate, sortByRating, sortByComments} from "../utils/utils.js";
 
 const FILMS_AMOUNT_PER_STEP = 5;
 
@@ -32,6 +34,12 @@ export default class MovieList {
     this._filmsListComponent = new FilmsListView();
     this._noFilmsComponent = new NoFilmsView();
     this._loadingComponent = new LoadingView();
+
+    this._topRatedComponent = new TopRatedView();
+    this._topRatedFilmsListComponent = new FilmsListView();
+
+    this._mostCommentedComponent = new MostCommentedView();
+    this._mostCommentedFilmsListComponent = new FilmsListView();
 
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
 
@@ -187,6 +195,38 @@ export default class MovieList {
     render(this._filmsComponent, this._noFilmsComponent, RenderPosition.BEFOREEND);
   }
 
+  _renderTopRated() {
+    // Определим длину сколько карточек рендерить
+    const MAX_TOPRATED_CARD_AMOUNT = 2;
+    const topRatedCardAmount = Math.min(MAX_TOPRATED_CARD_AMOUNT, this._filmsModel.getFilms().length);
+    const topRatedFilms = this._filmsModel.getFilms().sort(sortByRating).slice(0, topRatedCardAmount);
+    // Проверки на 0 и одинаковость
+    // Рендерим контейнер
+    render(this._filmsComponent, this._topRatedComponent, RenderPosition.BEFOREEND);
+    render(this._topRatedComponent, this._topRatedFilmsListComponent, RenderPosition.BEFOREEND);
+
+    // Обработчики???
+    topRatedFilms.forEach((film) => {
+      const TopRatedPresenter = new MovieCardPresenter(this._topRatedFilmsListComponent, this._handleViewAction, this._handleModeChange, this._api);
+      TopRatedPresenter.init(film);
+    });
+
+  }
+
+  _renderMostCommented() {
+    const MAX_MOSTCOMMENTED_CARD_AMOUNT = 2;
+    const mostCommentedCardAmount = Math.min(MAX_MOSTCOMMENTED_CARD_AMOUNT, this._filmsModel.getFilms().length);
+    const mostCommentedFilms = this._filmsModel.getFilms().sort(sortByComments).slice(0, mostCommentedCardAmount);
+
+    render(this._filmsComponent, this._mostCommentedComponent, RenderPosition.BEFOREEND);
+    render(this._mostCommentedComponent, this._mostCommentedFilmsListComponent, RenderPosition.BEFOREEND);
+
+    mostCommentedFilms.forEach((film) => {
+      const MostCommentedPresenter = new MovieCardPresenter(this._mostCommentedFilmsListComponent, this._handleViewAction);
+      MostCommentedPresenter.init(film);
+    });
+  }
+
   _renderMainContent() {
     if (this._isLoading) {
       this._renderLoading();
@@ -213,5 +253,8 @@ export default class MovieList {
     if (filmsAmount > this._renderedFilmsAmount) {
       this._renderShowMoreButton();
     }
+
+    this._renderTopRated();
+    this._renderMostCommented();
   }
 }

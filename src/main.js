@@ -79,17 +79,17 @@ apiWithProvider.getFilms()
     render(footerStatisitcsElement, new FooterStatsView(filmsModel.getFilms()), RenderPosition.BEFOREEND);
   });
 
-window.addEventListener(`load`, () => {
-  navigator.serviceWorker.register(`./sw.js`);
-});
+// window.addEventListener(`load`, () => {
+//   navigator.serviceWorker.register(`./sw.js`);
+// });
 
-window.addEventListener(`online`, () => {
-  document.title = document.title.replace(` [offline]`, ``);
-  if (apiWithProvider.isSyncRequired) {
-    apiWithProvider.sync();
-  }
-});
+// window.addEventListener(`online`, () => {
+//   document.title = document.title.replace(` [offline]`, ``);
+//   if (apiWithProvider.isSyncRequired) {
+//     apiWithProvider.sync();
+//   }
+// });
 
-window.addEventListener(`offline`, () => {
-  document.title += ` [offline]`;
-});
+// window.addEventListener(`offline`, () => {
+//   document.title += ` [offline]`;
+// });
