@@ -54,6 +54,8 @@ export default class MovieList {
 
     this._filmsModel.addObserver(this._handleModelEvent);
     this._filtersModel.addObserver(this._handleModelEvent);
+
+    this._updateMostCommented = this._updateMostCommented.bind(this);
   }
 
   _getFilms() {
@@ -86,7 +88,7 @@ export default class MovieList {
   }
 
   _renderCard(film, container, cardPresenterList) {
-    const cardPresenter = new MovieCardPresenter(container, this._handleViewAction, this._handleModeChange, this._api);
+    const cardPresenter = new MovieCardPresenter(container, this._handleViewAction, this._handleModeChange, this._api, this._updateMostCommented);
     cardPresenter.init(film);
     cardPresenterList[film.id] = cardPresenter;
   }
@@ -94,6 +96,14 @@ export default class MovieList {
   _handleModeChange() {
     Object
       .values(this._cardPresenter.mainList)
+      .forEach((presenter) => presenter.resetView());
+
+    Object
+      .values(this._cardPresenter.topRatedList)
+      .forEach((presenter) => presenter.resetView());
+
+    Object
+      .values(this._cardPresenter.mostCommentedList)
       .forEach((presenter) => presenter.resetView());
   }
 
@@ -121,9 +131,10 @@ export default class MovieList {
         // Тут нужно будет и обновить (клик по Watchlist etc) и перерисовать (если изменилось количество комментариев) mostCommented
         if (this._cardPresenter.mostCommentedList[data.id]) {
           this._cardPresenter.mostCommentedList[data.id].init(data);
-          break;
         }
         // И тут проблема, если меняется количество комментариев и составл блока, тогда надо перерисовать блок, но оставить попап.
+        // this._clearMostCommented();
+        // this._renderMostCommented();
         break;
       case UpdateType.MAJOR:
         this._clearMainContent({resetRenderedFilmsAmount: true, resetSortType: true});
@@ -265,6 +276,11 @@ export default class MovieList {
       .forEach((presenter) => presenter.destroy());
     this._cardPresenter.mostCommentedList = {};
     remove(this._mostCommentedComponent);
+  }
+
+  _updateMostCommented() {
+    this._clearMostCommented();
+    this._renderMostCommented();
   }
 
   _renderMainContent() {
