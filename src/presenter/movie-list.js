@@ -127,6 +127,8 @@ export default class MovieList {
         break;
       case UpdateType.MAJOR:
         this._clearMainContent({resetRenderedFilmsAmount: true, resetSortType: true});
+        this._clearTopRated();
+        this._clearMostCommented();
         this._renderMainContent();
         break;
       case UpdateType.INIT:
@@ -148,11 +150,8 @@ export default class MovieList {
       .values(this._cardPresenter.mainList)
       .forEach((presenter) => presenter.destroy());
 
-    this._cardPresenter = {
-      mainList: {},
-      topRatedList: {},
-      mostCommentedList: {}
-    };
+    this._cardPresenter.mainList = {};
+
     remove(this._noFilmsComponent);
     remove(this._sortComponent);
     remove(this._loadingComponent);
@@ -200,6 +199,8 @@ export default class MovieList {
     }
     this._currentSortType = sortType;
     this._clearMainContent({resetRenderedFilmsAmount: true});
+    this._clearTopRated();
+    this._clearMostCommented();
     this._renderMainContent();
   }
 
@@ -248,6 +249,22 @@ export default class MovieList {
     render(this._mostCommentedComponent, this._mostCommentedFilmsListComponent, RenderPosition.BEFOREEND);
 
     this._renderCards(mostCommentedFilms, this._mostCommentedFilmsListComponent, this._cardPresenter.mostCommentedList);
+  }
+
+  _clearTopRated() {
+    Object
+    .values(this._cardPresenter.topRatedList)
+    .forEach((presenter) => presenter.destroy());
+    this._cardPresenter.topRatedList = {};
+    remove(this._topRatedComponent);
+  }
+
+  _clearMostCommented() {
+    Object
+      .values(this._cardPresenter.mostCommentedList)
+      .forEach((presenter) => presenter.destroy());
+    this._cardPresenter.mostCommentedList = {};
+    remove(this._mostCommentedComponent);
   }
 
   _renderMainContent() {
