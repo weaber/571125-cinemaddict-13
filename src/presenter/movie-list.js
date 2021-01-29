@@ -133,8 +133,9 @@ export default class MovieList {
           this._cardPresenter.mostCommentedList[data.id].init(data);
         }
         // И тут проблема, если меняется количество комментариев и составл блока, тогда надо перерисовать блок, но оставить попап.
-        // this._clearMostCommented();
-        // this._renderMostCommented();
+        this._clearMostCommented();
+        // После этого маневра я уже в другом элементе???
+        this._renderMostCommented();
         break;
       case UpdateType.MAJOR:
         this._clearMainContent({resetRenderedFilmsAmount: true, resetSortType: true});

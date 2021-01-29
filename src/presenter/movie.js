@@ -69,7 +69,11 @@ export default class Movie {
 
   destroy() {
     remove(this._cardComponent);
-    remove(this._popupComponent);
+    // remove(this._popupComponent);
+    // Удалить ниже вернуть как было
+    if (this._mode === Mode.DEFAULT) {
+      remove(this._popupComponent);
+    }
   }
 
   resetView() {
@@ -119,7 +123,7 @@ export default class Movie {
     this._bodyElement.classList.remove(TemplateClasses.HIDE_OVERFLOW);
     document.removeEventListener(`keydown`, this._popupEscPressHandler);
     document.removeEventListener(`keydown`, this._formSubmitHandler);
-    this._updateMostCommented();
+    // this._updateMostCommented();
   }
 
   _popupEscPressHandler(evt) {
