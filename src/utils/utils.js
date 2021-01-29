@@ -31,6 +31,10 @@ export const sortByRating = (filmA, filmB) => {
   return filmB.rating - filmA.rating;
 };
 
+export const sortByComments = (filmA, filmB) => {
+  return filmB.comments.length - filmA.comments.length;
+};
+
 export const filter = {
   [FilterType.ALL]: (films) => films.filter((film) => film.id),
   [FilterType.WATCHLIST]: (films) => films.filter((film) => film.isWatchlist),

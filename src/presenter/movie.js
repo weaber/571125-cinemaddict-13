@@ -10,7 +10,8 @@ const Mode = {
 };
 
 export default class Movie {
-  constructor(movieListContainer, changeData, changeMode, api) {
+  constructor(movieListContainer, changeData, changeMode, api, updateMostCommented) {
+    this._updateMostCommented = updateMostCommented;
     this._api = api;
     this._bodyElement = document.querySelector(`body`);
     this._movieListContainer = movieListContainer;
@@ -68,7 +69,9 @@ export default class Movie {
 
   destroy() {
     remove(this._cardComponent);
-    remove(this._popupComponent);
+    if (this._mode === Mode.DEFAULT) {
+      remove(this._popupComponent);
+    }
   }
 
   resetView() {
@@ -118,6 +121,7 @@ export default class Movie {
     this._bodyElement.classList.remove(TemplateClasses.HIDE_OVERFLOW);
     document.removeEventListener(`keydown`, this._popupEscPressHandler);
     document.removeEventListener(`keydown`, this._formSubmitHandler);
+    this._updateMostCommented();
   }
 
   _popupEscPressHandler(evt) {
