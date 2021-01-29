@@ -120,22 +120,18 @@ export default class MovieList {
   _handleModelEvent(updateType, data) {
     switch (updateType) {
       case UpdateType.PATCH:
-        // Обновляем доску
+
         if (this._cardPresenter.mainList[data.id]) {
           this._cardPresenter.mainList[data.id].init(data);
         }
-        // Тут нужно просто обновить topRated
+
         if (this._cardPresenter.topRatedList[data.id]) {
           this._cardPresenter.topRatedList[data.id].init(data);
         }
-        // Тут нужно будет и обновить (клик по Watchlist etc) и перерисовать (если изменилось количество комментариев) mostCommented
+
         if (this._cardPresenter.mostCommentedList[data.id]) {
           this._cardPresenter.mostCommentedList[data.id].init(data);
         }
-        // И тут проблема, если меняется количество комментариев и составл блока, тогда надо перерисовать блок, но оставить попап.
-        this._clearMostCommented();
-        // После этого маневра я уже в другом элементе???
-        this._renderMostCommented();
         break;
       case UpdateType.MAJOR:
         this._clearMainContent({resetRenderedFilmsAmount: true, resetSortType: true});
@@ -231,7 +227,7 @@ export default class MovieList {
 
   _renderTopRated() {
     const MAX_TOPRATED_CARD_AMOUNT = 2;
-    const films = this._getFilms();
+    const films = this._filmsModel.getFilms();
 
     if (films.every((film) => film.rating === 0)) {
       return;
@@ -248,7 +244,7 @@ export default class MovieList {
 
   _renderMostCommented() {
     const MAX_MOSTCOMMENTED_CARD_AMOUNT = 2;
-    const films = this._getFilms();
+    const films = this._filmsModel.getFilms();
 
     if (films.every((film) => film.comments === 0)) {
       return;
